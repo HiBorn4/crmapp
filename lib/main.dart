@@ -1,3 +1,4 @@
+import 'package:crmapp/screens/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -23,9 +24,7 @@ void main() async {
 
   try {
     await Firebase.initializeApp(); // Initialize Firebase
-    print("✅ Firebase Initialized Successfully");
   } catch (e) {
-    print("🔥 Firebase Initialization Error: $e");
   }
 
   runApp(MyApp());
@@ -47,11 +46,13 @@ class MyApp extends StatelessWidget {
         Get.put(AuthService()); // Inject AuthService for authentication management
       }),
       initialRoute: "/",
-      home: SignupScreen(),
+      home: HomeScreen(),
       getPages: [
         GetPage(name: '/', page: () => SignupScreen()),
         GetPage(name: '/login', page: () => LoginScreen()),
         GetPage(name: '/home', page: () => HomeScreen()),
+
+        GetPage(name: '/search', page: () => SearchScreen()),
         GetPage(name: '/project-detail', page: () => ProjectDetailScreen()),
         GetPage(name: '/payment-schedule', page: () => PaymentScheduleScreen()),
         GetPage(name: '/cost-sheet', page: () => CostSheetScreen()),

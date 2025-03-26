@@ -14,7 +14,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _isPasswordVisible = false;
-  bool _isChecked = false;
 
   final TextEditingController _emailController =
       TextEditingController(text: "test@example.com"); // Default Email
@@ -36,28 +35,6 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _handleContinue() async {
-    try {
-      final email = _emailController.text.trim();
-      final password = _passwordController.text;
-
-      // LOGIN FLOW
-      final user = await _authService.signIn(email, password);
-
-      if (user != null) {
-        // Email Verified → Go to Home
-        if (user.emailVerified) {
-          Get.offAllNamed('/home');
-        } else {
-          // Email not verified → Send OTP
-          await _authService.sendOTP();
-          Get.toNamed('/otp', arguments: {'email': email});
-        }
-      }
-    } catch (e) {
-      print("🔥 Login Error: $e");
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

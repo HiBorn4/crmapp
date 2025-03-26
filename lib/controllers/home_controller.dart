@@ -5,9 +5,9 @@ import '../models/project_model.dart';
 class HomeController extends GetxController {
 
   final summaryData = [
-    {'value': '1', 'label': 'Total Units'},
-    {'value': '1,11,00,000', 'label': 'Total Due'},
-    {'value': '3,00,000', 'label': 'Total Paid'},
+    {'value': '7', 'label': 'Total Tasks'},
+    {'value': '195', 'label': 'Total Units'},
+    {'value': '3', 'label': 'Completed'},
   ];
 
   final attentionItems = [

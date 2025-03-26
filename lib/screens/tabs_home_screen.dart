@@ -1,26 +1,24 @@
 import 'package:crmapp/screens/modification_screen.dart';
-import 'package:crmapp/screens/overview_screen.dart';
-import 'package:crmapp/screens/project_detail_screen.dart';
-import 'package:crmapp/screens/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/home_controller.dart';
 import '../widgets/summary_item.dart';
 import '../utils/responsive.dart';
 
-class HomeScreen extends StatefulWidget {
+class TabsHomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<TabsHomeScreen> {
+  // final HomeController _controller = Get.put(HomeController());
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
     HomeContent(),
-    SearchScreen(),
-    OverviewScreen(),
-    ProjectDetailScreen(),
+    Center(child: Text("Documents Page")),
+    Center(child: Text("Applicants Page")),
+    Center(child: Text("Applicants Page")),
   ];
 
   void _onItemTapped(int index) {
@@ -97,19 +95,14 @@ class _HomeContentState extends State<HomeContent> {
           'amount': '₹ 9,00,000',
           'contact': index.isEven ? '+91 91234 56789' : 'UNIT NO 456'
         }),
-    List.generate(2, (index) => {
+    List.generate(6, (index) => {
           'unitNo': '132',
           'name': 'Vishal Kumar',
           'amount': '₹ 9,00,000',
           'contact': index.isEven ? '+91 91234 56789' : 'UNIT NO 456'
         }),
-    List.generate(3, (index) => {
-          'unitNo': '132',
-          'name': 'Vishal Kumar',
-          'amount': '₹ 9,00,000',
-          'contact': index.isEven ? '+91 91234 56789' : 'UNIT NO 456'
-        }),
-    List.generate(16, (index) => {
+    [],
+    List.generate(10, (index) => {
           'unitNo': '456',
           'name': 'Another User',
           'amount': '₹ 10,00,000',
@@ -178,7 +171,6 @@ class _HomeContentState extends State<HomeContent> {
                 ),
               ),
             ),
-            _buildFooterSection(screenWidth, screenHeight),
           ],
         ),
       ),
@@ -210,107 +202,121 @@ class _HomeContentState extends State<HomeContent> {
   }
 
   Widget _buildCategorySection(double screenWidth) {
-    final categories = [
-      {'value': '82', 'label': 'Booked'},
-      {'value': '0', 'label': 'Allotment'},
-      {'value': '0', 'label': 'Agreement'},
-      {'value': '16', 'label': 'Allotment'},
-    ];
+  final categories = [
+    {'value': '82', 'label': 'Booked'},
+    {'value': '0', 'label': 'Allotment'},
+    {'value': '0', 'label': 'Agreement'},
+    {'value': '16', 'label': 'Allotment'},
+  ];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'CATEGORY',
-          style: TextStyle(fontSize: Responsive.getFontSize(screenWidth, 14)),
-        ),
-        SizedBox(height: screenWidth * 0.02),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: categories.asMap().entries.map((entry) {
-              final index = entry.key;
-              final category = entry.value;
-              return Container(
-                margin: EdgeInsets.only(right: screenWidth * 0.02),
-                child: _buildCategoryItem(
-                  category['value']!,
-                  category['label']!,
-                  screenWidth,
-                  index,
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      
+      SizedBox(height: screenWidth * 0.02),
+      SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: categories.asMap().entries.map((entry) {
+            final index = entry.key;
+            final category = entry.value;
+            final isSelected = _selectedCategoryIndex == index;
+
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedCategoryIndex = index;
+                });
+              },
+              child: Container(
+                margin: EdgeInsets.only(right: screenWidth * 0.04),
+                padding: EdgeInsets.symmetric(
+                  vertical: screenWidth * 0.015,
+                  horizontal: screenWidth * 0.03,
                 ),
-              );
-            }).toList(),
-          ),
-        ),
-      ],
-    );
-  }
+                child: Row(
+                  children: [
+                    // Circle Number
+                    Container(
+                      width: screenWidth * 0.08,
+                      height: screenWidth * 0.08,
+                      decoration: BoxDecoration(
+                        color: isSelected ? Color(0xFFE6E0FA) : Colors.grey[300], // Selected = light lavender, Unselected = grey
+                        shape: BoxShape.circle,
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        category['value']!,
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.04,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: screenWidth * 0.02),
 
-  Widget _buildCategoryItem(
-    String value,
-    String label,
-    double screenWidth,
-    int index,
-  ) {
-    final isSelected = _selectedCategoryIndex == index;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedCategoryIndex = index;
-        });
-      },
-      child: Container(
-        width: screenWidth * 0.22,
-        padding: EdgeInsets.all(screenWidth * 0.02),
-        decoration: BoxDecoration(
-          color: isSelected ? Color(0xFFE6E0FA) : Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected ? Colors.black : Colors.grey[300]!,
-            width: 1,
+                    // Category Name
+                    Text(
+                      category['label']!,
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.04,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        color: isSelected ? Colors.black : Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    ],
+  );
+}
+
+
+
+  Widget _buildListItemSection(double screenWidth, double screenHeight) {
+  final items = _categoryData[_selectedCategoryIndex];
+
+  if (items.isEmpty) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            'assets/empty.png', // Replace with your actual image path
+            width: screenWidth * 0.6,
           ),
-        ),
-        child: Column(
-          children: [
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: screenWidth * 0.05,
-                fontWeight: FontWeight.bold,
-                color: isSelected ? Colors.black : Colors.grey,
-              ),
+          SizedBox(height: screenHeight * 0.02),
+          Text(
+            'Oops No Data Found...',
+            style: TextStyle(
+              fontSize: screenWidth * 0.045,
+              color: Colors.grey,
             ),
-            SizedBox(height: screenWidth * 0.01),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: screenWidth * 0.03,
-                color: isSelected ? Colors.black : Colors.grey,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildListItemSection(double screenWidth, double screenHeight) {
-    final items = _categoryData[_selectedCategoryIndex];
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ListView.separated(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: items.length,
-          separatorBuilder: (_, __) => SizedBox(height: screenHeight * 0),
-          itemBuilder: (context, index) => _buildListItem(items[index], screenWidth, screenHeight),
-        ),
-      ],
-    );
-  }
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      ListView.separated(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: items.length,
+        separatorBuilder: (_, __) => SizedBox(height: screenHeight * 0.005),
+        itemBuilder: (context, index) => _buildListItem(items[index], screenWidth, screenHeight),
+      ),
+    ],
+  );
+}
+
 
   Widget _buildListItem(Map<String, String> item, double screenWidth, double screenHeight) {
     return GestureDetector(
