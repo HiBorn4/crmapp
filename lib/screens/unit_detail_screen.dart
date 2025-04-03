@@ -1,6 +1,7 @@
 import 'package:crmapp/screens/cost_sheet_screen.dart';
 import 'package:crmapp/widgets/summary_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_direct_caller_plugin/flutter_direct_caller_plugin.dart';
 import 'package:get/get.dart';
 import '../controllers/unit_controller.dart';
 import '../widgets/dimension_graph_chart.dart';
@@ -181,7 +182,13 @@ class UnitDetailScreen extends StatelessWidget {
           ),
           IconButton(
             icon: Icon(Icons.call, size: screenWidth * 0.07),
-            onPressed: () => Get.to(() => UnitDetailScreen()),
+            onPressed: ()
+            {
+              String phoneNumber = contact.replaceAll(" ", "");
+              print(phoneNumber);
+             FlutterDirectCallerPlugin.callNumber(phoneNumber);
+            }
+            ,
           ),
         ],
       ),
