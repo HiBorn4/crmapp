@@ -1,6 +1,9 @@
+// ignore_for_file: invalid_use_of_protected_member
+
 import 'package:crmapp/screens/modification_screen.dart';
 import 'package:crmapp/screens/overview_screen.dart';
-import 'package:crmapp/screens/project_detail_screen.dart';
+import 'package:crmapp/screens/profile_screen.dart';
+import 'package:crmapp/screens/unit_detail_screen.dart';
 import 'package:crmapp/screens/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,19 +12,37 @@ import '../widgets/summary_item.dart';
 import '../utils/responsive.dart';
 
 class HomeScreen extends StatefulWidget {
+
+
+  final String uid;
+
+  HomeScreen({required this.uid});
+  
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
-    HomeContent(),
-    SearchScreen(),
-    OverviewScreen(),
-    ProjectDetailScreen(),
-  ];
+  
+  late HomeController controller;
+  int _selectedIndex = 0;
+  late List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(HomeController(uid: widget.uid)); // Pass UID to controller
+
+    // Initialize pages after controller is set
+    _pages = [
+      HomeContent(),
+      SearchScreen(),
+      OverviewScreen(),
+      ProfileScreen(uid: widget.uid),
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -87,35 +108,7 @@ class HomeContent extends StatefulWidget {
 }
 
 class _HomeContentState extends State<HomeContent> {
-  int _selectedCategoryIndex = 0;
-  final HomeController _controller = Get.find<HomeController>();
-
-  final List<List<Map<String, String>>> _categoryData = [
-    List.generate(5, (index) => {
-          'unitNo': '132',
-          'name': 'Vishal Kumar',
-          'amount': '₹ 9,00,000',
-          'contact': index.isEven ? '+91 91234 56789' : 'UNIT NO 456'
-        }),
-    List.generate(2, (index) => {
-          'unitNo': '132',
-          'name': 'Vishal Kumar',
-          'amount': '₹ 9,00,000',
-          'contact': index.isEven ? '+91 91234 56789' : 'UNIT NO 456'
-        }),
-    List.generate(3, (index) => {
-          'unitNo': '132',
-          'name': 'Vishal Kumar',
-          'amount': '₹ 9,00,000',
-          'contact': index.isEven ? '+91 91234 56789' : 'UNIT NO 456'
-        }),
-    List.generate(16, (index) => {
-          'unitNo': '456',
-          'name': 'Another User',
-          'amount': '₹ 10,00,000',
-          'contact': 'UNIT NO 789'
-        }),
-  ];
+  final HomeController controller = Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +132,7 @@ class _HomeContentState extends State<HomeContent> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Good Morning...!',
+              _getGreetingMessage(),
               style: TextStyle(
                 fontSize: Responsive.getFontSize(screenWidth, 20),
                 fontWeight: FontWeight.bold,
@@ -169,11 +162,14 @@ class _HomeContentState extends State<HomeContent> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildSummarySection(screenWidth, screenHeight),
+                    _buildSummarySection(screenWidth, screenHeight, controller),
                     SizedBox(height: screenHeight * 0.03),
                     _buildCategorySection(screenWidth),
                     SizedBox(height: screenHeight * 0.03),
-                    _buildListItemSection(screenWidth, screenHeight),
+                    // Obx(
+                      // () => 
+                      _buildListItemSection(screenWidth, screenHeight),
+                      // ),
                   ],
                 ),
               ),
@@ -185,39 +181,50 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 
-  Widget _buildSummarySection(double screenWidth, double screenHeight) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'UNIT SUMMARY',
-          style: TextStyle(fontSize: Responsive.getFontSize(screenWidth, 14)),
-        ),
-        SizedBox(height: screenWidth * 0.02),
-        Row(
-          children: _controller.summaryData.map((item) {
-            return Expanded(
-              child: SummaryItem(
-                value: item['value']!,
-                label: item['label']!,
-                screenWidth: screenWidth,
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
+  String _getGreetingMessage() {
+    int hour = DateTime.now().hour;
+
+    if (hour >= 5 && hour < 12) {
+      return "Good Morning...!";
+    } else if (hour >= 12 && hour < 17) {
+      return "Good Afternoon...!";
+    } else if (hour >= 17 && hour < 21) {
+      return "Good Evening...!";
+    } else {
+      return "Good Night...!";
+    }
   }
 
-  Widget _buildCategorySection(double screenWidth) {
-    final categories = [
-      {'value': '82', 'label': 'Booked'},
-      {'value': '0', 'label': 'Allotment'},
-      {'value': '0', 'label': 'Agreement'},
-      {'value': '16', 'label': 'Allotment'},
-    ];
+  Widget _buildSummarySection(double screenWidth, double screenHeight, HomeController controller) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        'UNIT SUMMARY',
+        style: TextStyle(fontSize: Responsive.getFontSize(screenWidth, 14)),
+      ),
+      SizedBox(height: screenWidth * 0.02),
+      
+      Obx(() => Row(
+        children: controller.summaryData.map((item) {
+          return Expanded(
+            child: SummaryItem(
+              value: item['value']!,
+              label: item['label']!,
+              screenWidth: screenWidth,
+            ),
+          );
+        }).toList(),
+      )),
+    ],
+  );
+}
 
-    return Column(
+
+  Widget _buildCategorySection(double screenWidth) {
+    return 
+    Obx(() => 
+    Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -228,15 +235,16 @@ class _HomeContentState extends State<HomeContent> {
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: categories.asMap().entries.map((entry) {
+            children: controller.categoryData.value.asMap().entries.map((entry) {
               final index = entry.key;
-              final category = entry.value;
+              final categoryItems = entry.value;
+              final value = categoryItems.length.toString();
+              final label = _getCategoryLabel(index);
               return Container(
                 margin: EdgeInsets.only(right: screenWidth * 0.02),
                 child: _buildCategoryItem(
-                  category['value']!,
-                  category['label']!,
+                  value,
+                  label,
                   screenWidth,
                   index,
                 ),
@@ -245,7 +253,20 @@ class _HomeContentState extends State<HomeContent> {
           ),
         ),
       ],
+    )
     );
+  }
+
+  String _getCategoryLabel(int index) {
+    switch(index) {
+      case 0: return 'Booked';
+      case 1: return 'Allotment';
+      case 2: return 'Agreement';
+      case 3: return 'Construction';
+      case 4: return 'Registration';
+      case 5: return 'Possession';
+      default: return 'Category';
+    }
   }
 
   Widget _buildCategoryItem(
@@ -254,21 +275,22 @@ class _HomeContentState extends State<HomeContent> {
     double screenWidth,
     int index,
   ) {
-    final isSelected = _selectedCategoryIndex == index;
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedCategoryIndex = index;
-        });
-      },
-      child: Container(
-        width: screenWidth * 0.22,
+      onTap: () => controller.changeCategory(index),
+      child: 
+      Obx(() => 
+      Container(
+        width: screenWidth * 0.23,
         padding: EdgeInsets.all(screenWidth * 0.02),
         decoration: BoxDecoration(
-          color: isSelected ? Color(0xFFE6E0FA) : Colors.white,
+          color: controller.selectedCategoryIndex.value == index 
+              ? Color(0xFFE6E0FA) 
+              : Colors.white,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? Colors.black : Colors.grey[300]!,
+            color: controller.selectedCategoryIndex.value == index 
+                ? Colors.black 
+                : Colors.grey[300]!,
             width: 1,
           ),
         ),
@@ -279,7 +301,9 @@ class _HomeContentState extends State<HomeContent> {
               style: TextStyle(
                 fontSize: screenWidth * 0.05,
                 fontWeight: FontWeight.bold,
-                color: isSelected ? Colors.black : Colors.grey,
+                color: controller.selectedCategoryIndex.value == index 
+                    ? Colors.black 
+                    : Colors.grey,
               ),
             ),
             SizedBox(height: screenWidth * 0.01),
@@ -287,71 +311,118 @@ class _HomeContentState extends State<HomeContent> {
               label,
               style: TextStyle(
                 fontSize: screenWidth * 0.03,
-                color: isSelected ? Colors.black : Colors.grey,
+                color: controller.selectedCategoryIndex.value == index 
+                    ? Colors.black 
+                    : Colors.grey,
               ),
             ),
           ],
         ),
+      )
       ),
     );
   }
 
   Widget _buildListItemSection(double screenWidth, double screenHeight) {
-    final items = _categoryData[_selectedCategoryIndex];
+  return Obx(() {
+    final categoryIndex = controller.selectedCategoryIndex.value;
+    
+    // Add null check and handle empty state
+    if (controller.categoryData.value.isEmpty || 
+        categoryIndex >= controller.categoryData.value.length) {
+      return Center(child: Text('No data available', style: TextStyle(fontSize: 16)));
+    }
+    
+    final categoryItems = controller.categoryData.value[categoryIndex];
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ListView.separated(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
-          itemCount: items.length,
-          separatorBuilder: (_, __) => SizedBox(height: screenHeight * 0),
-          itemBuilder: (context, index) => _buildListItem(items[index], screenWidth, screenHeight),
+          itemCount: categoryItems.length,
+          separatorBuilder: (_, __) => SizedBox(height: screenHeight * 0.01),
+          itemBuilder: (context, index) => _buildListItem(
+            categoryItems[index],
+            screenWidth,
+            screenHeight,
+          ),
         ),
       ],
     );
-  }
+  });
+}
 
-  Widget _buildListItem(Map<String, String> item, double screenWidth, double screenHeight) {
-    return GestureDetector(
-      onTap: () => Get.to(() => ModificationScreen()),
-      child: Container(
-        padding: EdgeInsets.all(screenWidth * 0.03),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          // borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 5,
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Column(
-              children: [
-                Container(
-                  width: screenWidth * 0.1,
-                  height: screenWidth * 0.1,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(screenWidth * 0.06),
+  Widget _buildListItem(Map<String, dynamic> item, double screenWidth, double screenHeight) {
+  // Safely extract values with null checks
+  final unitNo = item['unitNo']?.toString() ?? 'N/A';
+  final name = item['name']?.toString() ?? 'No Name';
+  final contact = item['contact']?.toString() ?? 'No Contact';
+  final amount = item['amount']?.toString() ?? '₹ 0';
+
+  return GestureDetector(
+    onTap: () => Get.to(() => ModificationScreen()),
+    child: Container(
+      margin: EdgeInsets.only(bottom: screenHeight * 0.01),
+      padding: EdgeInsets.all(screenWidth * 0.03),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 5,
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Column(
+            children: [
+              Container(
+                width: screenWidth * 0.1,
+                height: screenWidth * 0.1,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(screenWidth * 0.06),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  unitNo,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: screenWidth * 0.035,
+                    fontWeight: FontWeight.bold,
                   ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    item['unitNo']!,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: screenWidth * 0.035,
-                      fontWeight: FontWeight.bold,
-                    ),
+                ),
+              ),
+              SizedBox(height: screenHeight * 0.005),
+              Text(
+                'Unit No',
+                style: TextStyle(
+                  fontSize: screenWidth * 0.035,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(width: screenWidth * 0.04),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.04,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.005),
                 Text(
-                  'Unit No',
+                  contact,
                   style: TextStyle(
                     fontSize: screenWidth * 0.035,
                     color: Colors.grey[600],
@@ -359,45 +430,23 @@ class _HomeContentState extends State<HomeContent> {
                 ),
               ],
             ),
-            SizedBox(width: screenWidth * 0.04),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item['name']!,
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.04,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.005),
-                  Text(
-                    item['contact']!,
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.035,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ),
+          ),
+          Text(
+            amount,
+            style: TextStyle(
+              fontSize: screenWidth * 0.04,
+              fontWeight: FontWeight.bold,
             ),
-            Text(
-              item['amount']!,
-              style: TextStyle(
-                fontSize: screenWidth * 0.04,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            IconButton(
-              icon: Icon(Icons.arrow_forward_ios, size: screenWidth * 0.04),
-              onPressed: () => Get.to(() => ModificationScreen()),
-            ),
-          ],
-        ),
+          ),
+          IconButton(
+            icon: Icon(Icons.arrow_forward_ios, size: screenWidth * 0.04),
+            onPressed: () => Get.to(() => UnitDetailScreen()),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildFooterSection(double screenWidth, double screenHeight) {
     return Container(
@@ -436,7 +485,7 @@ class _HomeContentState extends State<HomeContent> {
           ),
           SizedBox(height: screenHeight * 0.01),
           GestureDetector(
-            onTap: () {},
+            onTap: () => _launchMap(),
             child: Text(
               'View in Map',
               style: TextStyle(
@@ -477,10 +526,10 @@ class _HomeContentState extends State<HomeContent> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildSocialIcon('assets/whatsapp.png', screenWidth * 0.06),
-              _buildSocialIcon('assets/insta.png', screenWidth * 0.06),
-              _buildSocialIcon('assets/x.png', screenWidth * 0.06),
-              _buildSocialIcon('assets/fb.png', screenWidth * 0.06),
+              _buildSocialIcon('assets/whatsapp.png', screenWidth * 0.06, () => _launchWhatsApp()),
+              _buildSocialIcon('assets/insta.png', screenWidth * 0.06, () => _launchInstagram()),
+              _buildSocialIcon('assets/x.png', screenWidth * 0.06, () => _launchTwitter()),
+              _buildSocialIcon('assets/fb.png', screenWidth * 0.06, () => _launchFacebook()),
             ],
           ),
         ],
@@ -488,15 +537,38 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 
-  Widget _buildSocialIcon(String assetPath, double size) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: size * 0.2),
-      child: Image.asset(
-        assetPath,
-        width: size,
-        height: size,
-        fit: BoxFit.contain,
+  Widget _buildSocialIcon(String assetPath, double size, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: size * 0.2),
+        child: Image.asset(
+          assetPath,
+          width: size,
+          height: size,
+          fit: BoxFit.contain,
+        ),
       ),
     );
+  }
+
+  void _launchMap() {
+    // Implement map launch functionality
+  }
+
+  void _launchWhatsApp() {
+    // Implement WhatsApp launch functionality
+  }
+
+  void _launchInstagram() {
+    // Implement Instagram launch functionality
+  }
+
+  void _launchTwitter() {
+    // Implement Twitter launch functionality
+  }
+
+  void _launchFacebook() {
+    // Implement Facebook launch functionality
   }
 }

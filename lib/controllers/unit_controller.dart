@@ -6,7 +6,7 @@ import '../models/quick_action_model.dart';
 import '../models/transaction_model.dart';
 import '../models/unit_model.dart';
 
-class ProjectController extends GetxController {
+class UnitController extends GetxController {
   // Unit Summary
   final totalAmount = 100000.0.obs;
   final paidAmount = 75000.0.obs;

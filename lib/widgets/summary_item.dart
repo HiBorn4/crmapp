@@ -19,10 +19,8 @@ class SummaryItem extends StatelessWidget {
       padding: EdgeInsets.all(screenWidth*0.03),
       decoration: BoxDecoration(
         color: Colors.white,
-        // borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
-        // mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(

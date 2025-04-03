@@ -1,153 +1,169 @@
-// File: services/auth_service.dart
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
-class AuthService extends GetxController {
+class AuthService extends GetxService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   
-  // Observable user state
-  Rx<User?> currentUser = Rx<User?>(null);
-  
+
+  // Reactive user state
+  final Rxn<User> currentUser = Rxn<User>();
+
   // Authentication state
-  RxBool isLoading = false.obs;
-  RxString errorMessage = ''.obs;
+  final RxBool isLoading = false.obs;
+  final RxString errorMessage = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
     // Set up auth state listener
-    currentUser.value = _auth.currentUser;
     _auth.authStateChanges().listen((User? user) {
       currentUser.value = user;
     });
   }
 
-  // Sign up with email and password
-  Future<User?> signUp(String email, String password) async {
-    try {
-      isLoading.value = true;
-      errorMessage.value = '';
-      
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password
-      );
-      
-      // Send email verification
-      await userCredential.user?.sendEmailVerification();
-      
-      return userCredential.user;
-    } on FirebaseAuthException catch (e) {
-      _handleAuthException(e);
-      return null;
-    } catch (e) {
-      errorMessage.value = 'An unexpected error occurred';
-      return null;
-    } finally {
-      isLoading.value = false;
+  // Get current user (non-reactive)
+  User? get user => _auth.currentUser;
+
+  // Check if user is logged in
+  bool get isLoggedIn => user != null;
+
+  // Check if email is verified
+  bool get isEmailVerified => user?.emailVerified ?? false;
+
+  Future<void> fetchUserData() async {
+  if (user == null) return; // Ensure user is logged in
+
+  try {
+    DocumentSnapshot userDoc = await _firestore.collection('users').doc(user!.uid).get();
+    
+    if (userDoc.exists) {
+      if (kDebugMode) {
+        print('User Data: ${userDoc.data()}');
+      } // Display user data in console
+    } else {
+      if (kDebugMode) {
+        print('User data not found in Firestore.');
+      }
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error fetching user data: $e');
     }
   }
+}
 
-  // Sign in with email and password
-  Future<User?> signIn(String email, String password) async {
-    try {
-      isLoading.value = true;
-      errorMessage.value = '';
-      
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password
-      );
-      
-      return userCredential.user;
-    } on FirebaseAuthException catch (e) {
-      _handleAuthException(e);
-      return null;
-    } catch (e) {
-      errorMessage.value = 'An unexpected error occurred';
-      return null;
-    } finally {
-      isLoading.value = false;
-    }
+Future<String?> signInWithEmailAndPassword(String email, String password) async {
+  try {
+    isLoading(true);
+    errorMessage('');
+
+    final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      email: email.trim(),
+      password: password.trim(),
+    );
+
+    await fetchUserData(); // Fetch user data after successful login
+
+    return userCredential.user?.uid; // Return the UID
+  } on FirebaseAuthException catch (e) {
+    _handleAuthException(e);
+    return null;
+  } catch (e) {
+    errorMessage('An unexpected error occurred');
+    return null;
+  } finally {
+    isLoading(false);
   }
+}
 
-  // Sign out
+
+  // Sign Out
   Future<void> signOut() async {
     try {
       await _auth.signOut();
+      currentUser.value = null;
     } catch (e) {
-      errorMessage.value = 'Error signing out';
+      errorMessage('Error signing out');
+      rethrow;
     }
   }
 
-  // Check if email is verified
-  bool isEmailVerified() {
-    return _auth.currentUser?.emailVerified ?? false;
+  // Send Password Reset Email
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      isLoading(true);
+      errorMessage('');
+      await _auth.sendPasswordResetEmail(email: email.trim());
+    } on FirebaseAuthException catch (e) {
+      _handleAuthException(e);
+    } catch (e) {
+      errorMessage('An unexpected error occurred');
+    } finally {
+      isLoading(false);
+    }
   }
 
-  // Reload user to check for email verification
+  // Reload user data (useful after email verification)
   Future<void> reloadUser() async {
     try {
-      await _auth.currentUser?.reload();
+      await user?.reload();
       currentUser.value = _auth.currentUser;
     } catch (e) {
-      errorMessage.value = 'Error refreshing user state';
+      errorMessage('Error refreshing user data');
+      rethrow;
     }
   }
 
-  // Send OTP (verification email)
-  Future<bool> sendOTP() async {
+  // Delete user account
+  Future<void> deleteAccount() async {
     try {
-      isLoading.value = true;
-      errorMessage.value = '';
-      
-      await _auth.currentUser?.sendEmailVerification();
-      return true;
+      await user?.delete();
+      currentUser.value = null;
     } catch (e) {
-      errorMessage.value = 'Error sending verification email';
-      return false;
-    } finally {
-      isLoading.value = false;
+      errorMessage('Error deleting account');
+      rethrow;
     }
-  }
-
-  // Get current user's email
-  String? getCurrentUserEmail() {
-    return _auth.currentUser?.email;
   }
 
   // Handle Firebase Auth exceptions
   void _handleAuthException(FirebaseAuthException e) {
     switch (e.code) {
       case 'email-already-in-use':
-        errorMessage.value = 'Email is already in use. Please login instead.';
+        errorMessage('This email is already registered');
         break;
       case 'invalid-email':
-        errorMessage.value = 'Invalid email address.';
+        errorMessage('Please enter a valid email address');
         break;
       case 'weak-password':
-        errorMessage.value = 'Password is too weak. Please use a stronger password.';
+        errorMessage('Password should be at least 6 characters');
         break;
       case 'user-not-found':
-        errorMessage.value = 'No user found with this email. Please sign up.';
+        errorMessage('No account found with this email');
         break;
       case 'wrong-password':
-        errorMessage.value = 'Incorrect password. Please try again.';
+        errorMessage('Incorrect password, please try again');
         break;
       case 'user-disabled':
-        errorMessage.value = 'This account has been disabled.';
+        errorMessage('This account has been disabled');
         break;
       case 'too-many-requests':
-        errorMessage.value = 'Too many requests. Please try again later.';
+        errorMessage('Too many attempts. Try again later');
         break;
       case 'operation-not-allowed':
-        errorMessage.value = 'This operation is not allowed.';
+        errorMessage('Email/password accounts are not enabled');
         break;
       case 'network-request-failed':
-        errorMessage.value = 'Network error. Please check your connection.';
+        errorMessage('Network error. Check your connection');
+        break;
+      case 'missing-password':
+        errorMessage('Password cannot be empty');
         break;
       default:
-        errorMessage.value = 'An error occurred: ${e.message}';
+        errorMessage(e.message ?? 'Authentication failed');
     }
   }
 }

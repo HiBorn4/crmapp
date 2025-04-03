@@ -1,25 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-
-import '../services/auth_service.dart';
 import 'login_screen.dart';
 
-class SignupScreen extends StatefulWidget { 
+class SignupScreen extends StatefulWidget {
   @override
   _SignupScreenState createState() => _SignupScreenState();
 }
 
 class _SignupScreenState extends State<SignupScreen> {
   final PageController _pageController = PageController();
-  late final AuthService _authService;
-  
-  @override
-  void initState() {
-    super.initState();
-    _authService = Get.find<AuthService>(); // Get the already initialized service
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -28,15 +18,14 @@ class _SignupScreenState extends State<SignupScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0),
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Image Carousel
             SizedBox(
-              height: screenHeight * 0.65, // 40% of screen height
-              width: screenWidth * 0.9, // 90% of screen width
+              height: screenHeight * 0.7, // 50% of screen height
               child: PageView(
                 controller: _pageController,
                 children: [
@@ -47,8 +36,9 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
             ),
 
-            // Dots Indicator
             SizedBox(height: screenHeight * 0.02),
+
+            // Dots Indicator
             SmoothPageIndicator(
               controller: _pageController,
               count: 3,
@@ -62,9 +52,9 @@ class _SignupScreenState extends State<SignupScreen> {
 
             SizedBox(height: screenHeight * 0.05),
 
-            // Sign Up Button
+            // Login Button
             SizedBox(
-              width: screenWidth*0.4,
+              width: screenWidth * 0.5,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFFDBD3FD),
@@ -74,44 +64,17 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
                 onPressed: () {
-                  // Navigate to login screen with signup mode
-                  Get.to(() => LoginScreen(isSignup: true));
+                  Get.to(() => LoginScreen());
                 },
                 child: Text(
-                  "Sign Up",
-                  style: TextStyle(fontSize: screenHeight * 0.022, color: Colors.black),
-                ),
-              ),
-            ),
-
-            SizedBox(height: screenHeight * 0.03),
-
-            // Login Text Button
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Have an account? ",
+                  "Log In",
                   style: TextStyle(
-                    fontSize: screenHeight * 0.02,
-                    color: Colors.black, // Black text
+                    fontSize: screenHeight * 0.022,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                GestureDetector(
-                  onTap: () {
-                    // Navigate to login screen with login mode
-                    Get.to(() => LoginScreen(isSignup: false));
-                  },
-                  child: Text(
-  "Log In",
-  style: TextStyle(
-    fontSize: screenHeight * 0.02,
-    color: Colors.purple, // Corrected hex color format
-    fontWeight: FontWeight.bold,
-  ),
-),
-                ),
-              ],
+              ),
             ),
           ],
         ),
