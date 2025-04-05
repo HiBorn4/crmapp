@@ -1,5 +1,6 @@
-// ignore_for_file: invalid_use_of_protected_member
+// ignore_for_file: avoid_print, invalid_use_of_protected_member
 
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 
@@ -17,7 +18,8 @@ class HomeController extends GetxController {
 
   // Category State
   final RxInt selectedCategoryIndex = 0.obs;
-  final RxList<List<Map<String, dynamic>>> categoryData = <List<Map<String, dynamic>>>[].obs;
+  final RxList<List<Map<String, dynamic>>> categoryData =
+      <List<Map<String, dynamic>>>[].obs;
 
   HomeController({required this.uid});
 
@@ -27,28 +29,28 @@ class HomeController extends GetxController {
     fetchUserData();
   }
 
-  /// Fetch user profile data
   Future<void> fetchUserData() async {
     try {
-      DocumentSnapshot userDoc = await _firestore.collection('users').doc(uid).get();
+      DocumentSnapshot userDoc =
+          await _firestore.collection('users').doc(uid).get();
 
       if (userDoc.exists) {
         userData.value = userDoc.data() as Map<String, dynamic>;
-        orgName.value = userData['orgName'] ?? ''; // Fetch orgName directly
+        orgName.value = userData['orgName'] ?? '';
         print('User data fetched: ${userData.value}');
 
         if (orgName.value.isNotEmpty) {
-          fetchTotalLeads();
+          await fetchTotalLeads();
         }
       } else {
         print('User document not found.');
       }
     } catch (e) {
       print('Error fetching user data: $e');
+      rethrow;
     }
   }
 
-  /// Fetch total leads count and category-wise distribution
   Future<void> fetchTotalLeads() async {
     if (orgName.value.isEmpty) {
       print("Error: orgName is empty, cannot fetch leads.");
@@ -56,42 +58,84 @@ class HomeController extends GetxController {
     }
 
     try {
-      String collectionName = '${orgName.value}_units'; // Example: "spark_units"
+      String collectionName = '${orgName.value}_units';
       print("Fetching leads from collection: $collectionName");
 
-      Map<String, int> statusCounts = {
-        'booked': 0,
-        'agreement_pipeline': 0,
-        'agreement': 0,
-        'registered': 0,
-        'possession': 0,
-        'construction': 0,
+      Map<String, List<Map<String, dynamic>>> categorizedLeads = {
+        'booked': [],
+        'agreement_pipeline': [],
+        'agreement': [],
+        'registered': [],
+        'possession': [],
+        'construction': [],
       };
 
-      for (String status in statusCounts.keys) {
-        var querySnapshot = await _firestore
-            .collection(collectionName)
-            .where("assignedTo", isEqualTo: uid)
-            .where("status", isEqualTo: status)
-            .get();
+      // Fetch all statuses in parallel
+      await Future.wait(
+        categorizedLeads.keys.map((status) async {
+          try {
+            var querySnapshot =
+                await _firestore
+                    .collection(collectionName)
+                    .where("assignedTo", isEqualTo: uid)
+                    .where("status", isEqualTo: status)
+                    .get();
 
-        statusCounts[status] = querySnapshot.docs.length;
-      }
+            categorizedLeads[status] =
+                querySnapshot.docs.map((doc) {
+                  return _sanitizeData(doc.data());
+                }).toList();
+          } catch (e) {
+            print('Error fetching $status leads: $e');
+          }
+        }),
+      );
 
-      // Set total lead count
-      totalLeadsCount.value = statusCounts.values.reduce((a, b) => a + b);
+      // Update counts and UI
+      totalLeadsCount.value = categorizedLeads.values.fold(
+        0,
+        (sum, list) => sum + list.length,
+      );
       updateSummaryData();
-
-      // Update category data
-      updateCategoryData(statusCounts);
-
-      print("Total leads count: ${totalLeadsCount.value}");
+      updateCategoryData(categorizedLeads);
     } catch (e) {
       print('Error fetching total leads: $e');
+      rethrow;
     }
   }
 
-  /// Updates summary section UI
+    Map<String, dynamic> _sanitizeData(Map<String, dynamic> data) {
+    final sanitized = <String, dynamic>{};
+
+    data.forEach((key, value) {
+      sanitized[key] = _convertValue(value);
+    });
+
+    return sanitized;
+  }
+
+  dynamic _convertValue(dynamic value) {
+    if (value is Timestamp) {
+      return value.toDate().toIso8601String();
+    }
+    if (value is GeoPoint) {
+      return {'lat': value.latitude, 'lng': value.longitude};
+    }
+    if (value is DateTime) {
+      return value.toIso8601String();
+    }
+    if (value is double && value.isNaN) {
+      return 0;
+    }
+    if (value is Map<String, dynamic>) {
+      return _sanitizeData(value);
+    }
+    if (value is List) {
+      return value.map((item) => _convertValue(item)).toList();
+    }
+    return value;
+  }
+
   void updateSummaryData() {
     summaryData.value = [
       {'value': '0', 'label': 'Total Tasks'},
@@ -101,45 +145,31 @@ class HomeController extends GetxController {
     update();
   }
 
-  /// Update category-wise data dynamically
-  void updateCategoryData(Map<String, int> statusCounts) {
+  void updateCategoryData(
+    Map<String, List<Map<String, dynamic>>> categorizedLeads,
+  ) {
     categoryData.value = [
-      List.generate(statusCounts['booked'] ?? 0, (index) => _generateItem(index, 'booked')),
-      List.generate(statusCounts['agreement_pipeline'] ?? 0, (index) => _generateItem(index, 'agreement_pipeline')),
-      List.generate(statusCounts['agreement'] ?? 0, (index) => _generateItem(index, 'agreement')),
-      List.generate(statusCounts['construction'] ?? 0, (index) => _generateItem(index, 'construction')),
-      List.generate(statusCounts['registered'] ?? 0, (index) => _generateItem(index, 'registered')),
-      List.generate(statusCounts['possession'] ?? 0, (index) => _generateItem(index, 'possession')),
+      categorizedLeads['booked'] ?? [],
+      categorizedLeads['agreement_pipeline'] ?? [],
+      categorizedLeads['agreement'] ?? [],
+      categorizedLeads['construction'] ?? [],
+      categorizedLeads['registered'] ?? [],
+      categorizedLeads['possession'] ?? [],
     ];
-
     update();
-    print('Updated category data with ${categoryData.value.length} categories');
   }
 
-  /// Generate a lead item with mock data
-  Map<String, dynamic> _generateItem(int index, String category) {
-    return {
-      'unitNo': index,
-      'name': userData['name'] ?? 'Unknown User',
-      'status': category.toUpperCase(),
-      'amount': '₹ ${(10 + index)}',
-      'contact': index.isEven ? '+91 91234 56789' : 'N/A',
-    };
-  }
-
-  /// Change selected category index
   void changeCategory(int index) {
-    if (index >= 0 && index < categoryData.value.length) {
+    if (index >= 0 && index < categoryData.length) {
       selectedCategoryIndex.value = index;
-      print('Changed to category $index with ${categoryData.value[index].length} items');
     }
   }
 
-  /// Get data for the currently selected category
   List<Map<String, dynamic>> get currentCategoryData {
-    if (categoryData.value.isEmpty || selectedCategoryIndex.value >= categoryData.value.length) {
+    if (categoryData.isEmpty ||
+        selectedCategoryIndex.value >= categoryData.length) {
       return [];
     }
-    return categoryData.value[selectedCategoryIndex.value];
+    return categoryData[selectedCategoryIndex.value];
   }
 }

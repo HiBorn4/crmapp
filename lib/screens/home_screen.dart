@@ -1,4 +1,4 @@
-// ignore_for_file: invalid_use_of_protected_member
+// ignore_for_file: invalid_use_of_protected_member, avoid_print
 
 import 'package:crmapp/screens/modification_screen.dart';
 import 'package:crmapp/screens/overview_screen.dart';
@@ -14,9 +14,9 @@ import '../utils/responsive.dart';
 class HomeScreen extends StatefulWidget {
 
 
-  final String uid;
+  final String userUid;
 
-  HomeScreen({required this.uid});
+  HomeScreen({required this.userUid});
   
 
   @override
@@ -33,14 +33,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    controller = Get.put(HomeController(uid: widget.uid)); // Pass UID to controller
+    controller = Get.put(HomeController(uid: widget.userUid)); // Pass UID to controller
 
     // Initialize pages after controller is set
     _pages = [
-      HomeContent(),
+      HomeContent(userUid: widget.userUid),
       SearchScreen(),
       OverviewScreen(),
-      ProfileScreen(uid: widget.uid),
+      ProfileScreen(uid: widget.userUid),
     ];
   }
 
@@ -103,6 +103,9 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class HomeContent extends StatefulWidget {
+  final String userUid;
+
+  HomeContent({required this.userUid});
   @override
   _HomeContentState createState() => _HomeContentState();
 }
@@ -286,13 +289,6 @@ class _HomeContentState extends State<HomeContent> {
           color: controller.selectedCategoryIndex.value == index 
               ? Color(0xFFE6E0FA) 
               : Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: controller.selectedCategoryIndex.value == index 
-                ? Colors.black 
-                : Colors.grey[300]!,
-            width: 1,
-          ),
         ),
         child: Column(
           children: [
@@ -342,7 +338,7 @@ class _HomeContentState extends State<HomeContent> {
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
           itemCount: categoryItems.length,
-          separatorBuilder: (_, __) => SizedBox(height: screenHeight * 0.01),
+          separatorBuilder: (_, __) => SizedBox(height: screenHeight * 0),
           itemBuilder: (context, index) => _buildListItem(
             categoryItems[index],
             screenWidth,
@@ -356,19 +352,19 @@ class _HomeContentState extends State<HomeContent> {
 
   Widget _buildListItem(Map<String, dynamic> item, double screenWidth, double screenHeight) {
   // Safely extract values with null checks
-  final unitNo = item['unitNo']?.toString() ?? 'N/A';
-  final name = item['name']?.toString() ?? 'No Name';
-  final contact = item['contact']?.toString() ?? 'No Contact';
-  final amount = item['amount']?.toString() ?? '₹ 0';
+final unitNo = item['unit_no']?.toString() ?? 'N/A';
+final name = item['customerDetailsObj']?['customerName1']?.toString() ?? 'N/A';
+final contact = item['customerDetailsObj']?['phoneNo1']?.toString() ?? 'No Contact';
+final amount = item['T_total']?.toString() ?? '₹ 0';
 
-  return GestureDetector(
-    onTap: () => Get.to(() => ModificationScreen()),
-    child: Container(
-      margin: EdgeInsets.only(bottom: screenHeight * 0.01),
-      padding: EdgeInsets.all(screenWidth * 0.03),
+  final projectUid = item['uid']?.toString() ?? 'UID';
+  print(projectUid);
+
+
+  return Container(
+      padding: EdgeInsets.all(screenWidth * 0.02),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.1),
@@ -440,12 +436,12 @@ class _HomeContentState extends State<HomeContent> {
           ),
           IconButton(
             icon: Icon(Icons.arrow_forward_ios, size: screenWidth * 0.04),
-            onPressed: () => Get.to(() => UnitDetailScreen()),
+            onPressed: () => Get.to(() => UnitDetailScreen(projectUid, widget.userUid)),
           ),
         ],
       ),
-    ),
-  );
+    );
+  
 }
 
   Widget _buildFooterSection(double screenWidth, double screenHeight) {

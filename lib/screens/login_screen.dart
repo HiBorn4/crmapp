@@ -33,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     if (uid != null) {
-      Get.off(() => HomeScreen(uid: uid)); // Navigate to HomeScreen with UID
+      Get.off(() => HomeScreen(userUid: uid)); // Navigate to HomeScreen with UID
     } else {
       Get.snackbar('Login Failed', _authService.errorMessage.value);
     }

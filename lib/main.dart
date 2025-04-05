@@ -46,15 +46,14 @@ class MyApp extends StatelessWidget {
           AuthService(),
         ); // Inject AuthService for authentication management
         // Get.put(HomeController()); // Inject HomeController
-      }),
+      }), 
       initialRoute: "/",
       home: SignupScreen(),
-      // home: HomeScreen(uid: 'M7IFjcWq0mVxUmuqSa55pNW4UNl2'),
+      // home: HomeScreen(uid: 'M7IFjcWq0mVxUmuqSa55pNW4UNl2'), 
       getPages: [
         GetPage(name: '/', page: () => SignupScreen()),
         GetPage(name: '/login', page: () => LoginScreen()),
         GetPage(name: '/search', page: () => SearchScreen()),
-        GetPage(name: '/project-detail', page: () => UnitDetailScreen()),
         GetPage(name: '/payment-schedule', page: () => PaymentScheduleScreen()),
         GetPage(name: '/cost-sheet', page: () => CostSheetScreen()),
         GetPage(name: '/activity-log', page: () => ActivityLogScreen()),
