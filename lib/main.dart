@@ -1,9 +1,8 @@
-import 'package:crmapp/screens/home_screen.dart';
 import 'package:crmapp/screens/search_screen.dart';
+import 'package:crmapp/screens/task_reminder_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'controllers/home_controller.dart';
 import 'screens/about_screen.dart';
 import 'screens/activity_log_screen.dart';
 import 'screens/change_password_screen.dart';
@@ -12,7 +11,6 @@ import 'screens/document_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/modification_screen.dart';
 import 'screens/payment_schedule_screen.dart';
-import 'screens/unit_detail_screen.dart';
 import 'screens/refer_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/transaction_detail_screen.dart';
@@ -21,11 +19,9 @@ import 'services/auth_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensures Flutter is initialized properly
-  
 
   await Firebase.initializeApp(); // Initialize Firebase
 
-  // Get.put(HomeController()); // Inject HomeController
   runApp(MyApp());
 }
 
@@ -42,14 +38,11 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       initialBinding: BindingsBuilder(() {
-        Get.put(
-          AuthService(),
-        ); // Inject AuthService for authentication management
-        // Get.put(HomeController()); // Inject HomeController
-      }), 
+        Get.put(AuthService());
+      }),
       initialRoute: "/",
-      home: SignupScreen(),
-      // home: HomeScreen(uid: 'M7IFjcWq0mVxUmuqSa55pNW4UNl2'), 
+      // home: SignupScreen(),
+      home: TaskReminderScreen(),
       getPages: [
         GetPage(name: '/', page: () => SignupScreen()),
         GetPage(name: '/login', page: () => LoginScreen()),

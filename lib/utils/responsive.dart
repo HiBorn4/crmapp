@@ -13,4 +13,18 @@ class Responsive {
       vertical: screenWidth < 600 ? 8 : 16,
     );
   }
+    static double getWidth(double pixels, BuildContext context) {
+    return MediaQuery.of(context).size.width * (pixels / 375); // 375 is base design width
+  }
+
+  static double getHeight(double pixels, BuildContext context) {
+    return MediaQuery.of(context).size.height * (pixels / 812); // 812 is base design height
+  }
+
+  static double getFontSizeContext(double pixels, BuildContext context) {
+    return getWidth(pixels, context);
+  }
+
+  
+
 }
