@@ -4,19 +4,20 @@ class SummaryItem extends StatelessWidget {
   final String value;
   final String label;
   final double screenWidth;
+  final bool isFirst;
 
   const SummaryItem({
     required this.value,
     required this.label,
     required this.screenWidth,
+    this.isFirst = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-    
-      margin: EdgeInsets.symmetric(horizontal: 5),
-      padding: EdgeInsets.all(screenWidth*0.03),
+      margin: EdgeInsets.only(left: isFirst ? 0 : 5),
+      padding: EdgeInsets.all(screenWidth * 0.03),
       decoration: BoxDecoration(
         color: Colors.white,
       ),

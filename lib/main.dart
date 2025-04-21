@@ -45,8 +45,6 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/', page: () => SignupScreen()),
         GetPage(name: '/login', page: () => LoginScreen()),
         GetPage(name: '/search', page: () => SearchScreen()),
-        GetPage(name: '/payment-schedule', page: () => PaymentScheduleScreen()),
-        GetPage(name: '/cost-sheet', page: () => CostSheetScreen()),
         GetPage(name: '/activity-log', page: () => ActivityLogScreen()),
         GetPage(name: '/modification', page: () => ModificationScreen()),
         GetPage(name: '/about', page: () => AboutScreen()),

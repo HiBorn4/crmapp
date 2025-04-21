@@ -32,6 +32,86 @@ class UnitController extends GetxController {
       <Map<String, String>>[].obs;
     // Dummy data for testing if needed (remove if using live data)
   final RxList<PaymentEntry> payments = <PaymentEntry>[].obs;
+  final RxList<CostItem> additionalCharges = <CostItem>[].obs;
+final RxList<CostItem> constructionCharges = <CostItem>[].obs;
+final RxList<CostItem> constructionAdditionalCharges = <CostItem>[].obs;
+final RxList<CostItem> possessionCharges = <CostItem>[].obs;
+
+final RxDouble tA = 0.0.obs;
+final RxDouble tB = 0.0.obs;
+final RxDouble tC = 0.0.obs;
+final RxDouble tD = 0.0.obs;
+final RxDouble tE = 0.0.obs;
+
+void _parseTValues() {
+  // Fetch the values from projectData and set them, defaulting to 0.0 if not found
+  tA.value = (projectData["T_A"] ?? 0.0).toDouble();
+  tB.value = (projectData["T_B"] ?? 0.0).toDouble();
+  tC.value = (projectData["T_C"] ?? 0.0).toDouble();
+  tD.value = (projectData["T_D"] ?? 0.0).toDouble();
+  tE.value = (projectData["T_E"] ?? 0.0).toDouble();
+
+  print("📊 T-Values:");
+  print("T_A: ${tA.value}");
+  print("T_B: ${tB.value}");
+  print("T_C: ${tC.value}");
+  print("T_D: ${tD.value}");
+  print("T_E: ${tE.value}");
+}
+
+
+List<CostItem> _extractCostItems(String key) {
+  List<CostItem> items = [];
+
+  print('🔍 Extracting cost items from key: $key');
+  
+  if (projectData.containsKey(key)) {
+    var list = projectData[key];
+    print('📦 Raw data for $key: $list');
+
+    if (list is List) {
+      for (int i = 0; i < list.length; i++) {
+        var item = list[i];
+        try {
+          print('➡️ Parsing item $i: $item');
+
+          String label = item["component"]?["label"]?.toString().trim() ?? "N/A";
+          double price = double.tryParse(item["TotalNetSaleValueGsT"].toString()) ?? 0.0;
+          String formattedPrice = "₹ ${_formatCurrency(price)}";
+
+          print('✅ Parsed: Label = $label | Price = $formattedPrice');
+
+          items.add(CostItem(label, '', formattedPrice));
+        } catch (e) {
+          print("❌ Error parsing item $i in $key: $e");
+        }
+      }
+    } else {
+      print('⚠️ Expected a List for $key, but got: ${list.runtimeType}');
+    }
+  } else {
+    print('❌ projectData does not contain key: $key');
+  }
+
+  return items;
+}
+
+
+
+void _parseCostItems() {
+  additionalCharges.value = _extractCostItems("additionalChargesCS");
+  constructionCharges.value = _extractCostItems("ConstructCS");
+  constructionAdditionalCharges.value = _extractCostItems("constAdditionalChargesCS");
+  possessionCharges.value = _extractCostItems("PossessionAdditionalCostCS");
+  
+
+  print("✅ Parsed Cost Items:");
+  print("Additional Charges: ${additionalCharges.length}");
+  print("Construction Charges: ${constructionCharges.length}");
+  print("Construction Additional Charges: ${constructionAdditionalCharges.length}");
+  print("Possession Charges: ${possessionCharges.length}");
+}
+
 
   String name = '';
   String dob = '';
@@ -111,6 +191,10 @@ class UnitController extends GetxController {
         // _printLongText('\n📦 Formatted Project Data for ID: $projectUid\n$formattedJson');
 
         _parseUnitSummaryData();
+        _parseCostItems();
+        _parseTValues();
+
+
         _parsePaymentData();
         getApplicantDetailsFromProject();
       } else {
@@ -313,6 +397,15 @@ class UnitController extends GetxController {
   print('📜 Permanent Address: $permAdd');
 }
 
-
+final List<QuickActionModel> quickActions = [
+    QuickActionModel(
+      title: 'Payment Schedule',
+      description: 'View payment timeline',
+    ),
+    QuickActionModel(
+      title: 'Make a Payment',
+      description: 'Initiate new payment',
+    ),
+  ].obs;
 
 }

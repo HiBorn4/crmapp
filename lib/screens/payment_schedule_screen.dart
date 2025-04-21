@@ -1,13 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/payment_schedule_controller.dart';
+import '../controllers/unit_controller.dart';
 import '../models/payment_entry_model.dart';
 import '../models/quick_action_model.dart';
+import '../utils/amount_formatting.dart';
 import '../utils/app_colors.dart';
 
-class PaymentScheduleScreen extends StatelessWidget {
-  final PaymentScheduleController _controller = Get.put(PaymentScheduleController());
+class PaymentScheduleScreen extends StatefulWidget {
+  final String projectUid;
+  final String userUid;
 
+  PaymentScheduleScreen(this.projectUid, this.userUid);
+  @override
+  State<PaymentScheduleScreen> createState() => _PaymentScheduleScreenState();
+}
+
+class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
+   late UnitController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = Get.put(
+      UnitController(userUid: widget.userUid, projectUid: widget.projectUid),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -61,6 +84,9 @@ class PaymentScheduleScreen extends StatelessWidget {
   }
 
   Widget _buildTotalBalance(double screenWidth, double screenHeight) {
+  return Obx(() {
+    final totalAmount = _controller.totalAmount.value;
+
     return Column(
       children: [
         Text(
@@ -71,16 +97,25 @@ class PaymentScheduleScreen extends StatelessWidget {
           ),
         ),
         SizedBox(height: screenHeight * 0.01),
-        Text(
-          '₹ 1,11,32,000',
-          style: TextStyle(
-            fontSize: screenHeight * 0.035,
-            fontWeight: FontWeight.bold,
-          ),
+        TweenAnimationBuilder<double>(
+          tween: Tween<double>(begin: 0, end: totalAmount),
+          duration: const Duration(seconds: 2),
+          builder: (context, value, _) {
+            return Text(
+              formatIndianCurrency(value),
+              style: TextStyle(
+                fontSize: screenHeight * 0.035,
+                fontWeight: FontWeight.bold,
+              ),
+            );
+          },
         ),
       ],
     );
-  }
+  });
+}
+
+
 
   Widget _buildPaymentList(double screenWidth, double screenHeight) {
     return Obx(() => ListView.builder(
@@ -256,7 +291,6 @@ class PaymentScheduleScreen extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _buildQuickActionsSection(double screenWidth, double screenHeight) {
     return Column(

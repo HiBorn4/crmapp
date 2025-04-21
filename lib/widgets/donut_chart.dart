@@ -17,52 +17,44 @@ class DonutChart extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    int remainingBalance = (total - paid).round(); // Convert to int (remove decimals)
+Widget build(BuildContext context) {
+  final bool isValid = total > 0;
+  final int remainingBalance = isValid ? (total - paid).round() : 0;
+  final int percentage = isValid ? ((paid / total) * 100).round() : 0;
 
-    return SizedBox(
-      width: size * 1.2, // Increase the total size of the donut
-      height: size * 1.2, // Increase the total size of the donut
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          CustomPaint(
-            size: Size(size, size),
-            painter: _DonutChartPainter(
-              paid: paid,
-              total: total,
-              paidColor: paidColor,
-              eligibleColor: eligibleColor,
+  return SizedBox(
+    width: size * 1.2,
+    height: size * 1.2,
+    child: Stack(
+      alignment: Alignment.center,
+      children: [
+        CustomPaint(
+          size: Size(size, size),
+          painter: _DonutChartPainter(
+            paid: isValid ? paid : 0,
+            total: isValid ? total : 1, // Prevent division by 0
+            paidColor: paidColor,
+            eligibleColor: eligibleColor,
+          ),
+        ),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "$percentage%",
+              style: TextStyle(
+                fontSize: size * 0.16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
             ),
-          ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
 
-          // Centered Balance Text
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Balance",
-                style: TextStyle(
-                  fontSize: size * 0.1,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black54,
-                ),
-              ),
-              SizedBox(height: size * 0.02),
-              Text(
-                "₹$remainingBalance", // Display as integer
-                style: TextStyle(
-                  fontSize: size * 0.12, // Increased balance font size
-                  fontWeight: FontWeight.w900,
-                  color: Colors.black,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _DonutChartPainter extends CustomPainter {
@@ -80,9 +72,9 @@ class _DonutChartPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final double strokeWidth = size.width * 0.25; // Increased thickness
+    final double strokeWidth = size.width * 0.2; // Increased thickness
     final Offset center = Offset(size.width / 2, size.height / 2);
-    final double radius = (size.width - strokeWidth) * 1.15;
+    final double radius = (size.width - strokeWidth) * 0.9;
     final double paidPercentage = paid / total;
 
     final Paint paint = Paint()

@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import '../controllers/home_controller.dart';
 import '../widgets/summary_item.dart';
 import '../utils/responsive.dart';
+import 'package:intl/intl.dart'; // Add this at the top
 
 class HomeScreen extends StatefulWidget {
 
@@ -119,16 +120,19 @@ class _HomeContentState extends State<HomeContent> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: Padding(
-          padding: EdgeInsets.all(screenWidth * 0.02),
-          child: ClipOval(
-            child: Image.asset(
-              'assets/home_profile.png',
-              width: screenWidth * 0.1,
-              height: screenWidth * 0.1,
-              fit: BoxFit.cover,
+        leading: Row(
+          children: [
+            SizedBox(width: screenWidth*0.03,),
+            ClipOval(
+                child: Image.asset(
+                  'assets/home_profile.png',
+                  width: screenWidth * 0.11,
+                  height: screenWidth * 0.11,
+                  fit: BoxFit.cover,
+                ),
+              
             ),
-          ),
+          ],
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,14 +140,14 @@ class _HomeContentState extends State<HomeContent> {
             Text(
               _getGreetingMessage(),
               style: TextStyle(
-                fontSize: Responsive.getFontSize(screenWidth, 20),
-                fontWeight: FontWeight.bold,
+                fontSize: Responsive.getFontSize(screenWidth, 18),
+                
               ),
             ),
             Text(
               'Vishal',
               style: TextStyle(
-                fontSize: Responsive.getFontSize(screenWidth, 28),
+                fontSize: Responsive.getFontSize(screenWidth, 20),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -165,9 +169,9 @@ class _HomeContentState extends State<HomeContent> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildSummarySection(screenWidth, screenHeight, controller),
-                    SizedBox(height: screenHeight * 0.03),
-                    _buildCategorySection(screenWidth),
-                    SizedBox(height: screenHeight * 0.03),
+                    SizedBox(height: screenHeight * 0.02),
+                    _buildCategorySection(screenHeight, screenWidth),
+                    SizedBox(height: screenHeight * 0.01),
                     // Obx(
                       // () => 
                       _buildListItemSection(screenWidth, screenHeight),
@@ -205,25 +209,29 @@ class _HomeContentState extends State<HomeContent> {
         'UNIT SUMMARY',
         style: TextStyle(fontSize: Responsive.getFontSize(screenWidth, 14)),
       ),
-      SizedBox(height: screenWidth * 0.02),
+      SizedBox(height: screenHeight * 0.015),
       
       Obx(() => Row(
-        children: controller.summaryData.map((item) {
-          return Expanded(
-            child: SummaryItem(
-              value: item['value']!,
-              label: item['label']!,
-              screenWidth: screenWidth,
-            ),
-          );
-        }).toList(),
-      )),
+  children: controller.summaryData.asMap().entries.map((entry) {
+    int index = entry.key;
+    var item = entry.value;
+
+    return Expanded(
+      child: SummaryItem(
+        value: item['value']!,
+        label: item['label']!,
+        screenWidth: screenWidth,
+        isFirst: index == 0,
+      ),
+    );
+  }).toList(),
+)),
     ],
   );
 }
 
 
-  Widget _buildCategorySection(double screenWidth) {
+  Widget _buildCategorySection(double screenHeight, double screenWidth) {
     return 
     Obx(() => 
     Column(
@@ -233,7 +241,7 @@ class _HomeContentState extends State<HomeContent> {
           'CATEGORY',
           style: TextStyle(fontSize: Responsive.getFontSize(screenWidth, 14)),
         ),
-        SizedBox(height: screenWidth * 0.02),
+        SizedBox(height: screenHeight * 0.015),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -368,17 +376,18 @@ if (controller.categoryData.value.isEmpty ||
 }
 
   Widget _buildListItem(Map<String, dynamic> item, double screenWidth, double screenHeight) {
-  // Safely extract values with null checks
-final unitNo = item['unit_no']?.toString() ?? 'N/A';
-final name = item['customerDetailsObj']?['customerName1']?.toString() ?? 'N/A';
-final contact = item['customerDetailsObj']?['phoneNo1']?.toString() ?? 'No Contact';
-final amount = item['T_total']?.toString() ?? '₹ 0';
-
+  final unitNo = item['unit_no']?.toString() ?? 'N/A';
+  final name = item['customerDetailsObj']?['customerName1']?.toString() ?? 'N/A';
+  final contact = item['customerDetailsObj']?['phoneNo1']?.toString() ?? 'No Contact';
+  final amount = item['T_total']?.toString() ?? '₹ 0';
   final projectUid = item['uid']?.toString() ?? 'UID';
-  print(projectUid);
+final double parsedAmount = double.tryParse(amount.replaceAll(RegExp(r'[^\d.]'), '')) ?? 0;
+final int roundedAmount = parsedAmount.ceil();
+final formattedAmount = NumberFormat('#,##,##0', 'en_IN').format(roundedAmount);
 
-
-  return Container(
+  return GestureDetector(
+    onTap: () => Get.to(() => UnitDetailScreen(projectUid, widget.userUid)),
+    child: Container(
       padding: EdgeInsets.all(screenWidth * 0.02),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -444,22 +453,27 @@ final amount = item['T_total']?.toString() ?? '₹ 0';
               ],
             ),
           ),
-          Text(
-            amount,
-            style: TextStyle(
-              fontSize: screenWidth * 0.04,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          IconButton(
-            icon: Icon(Icons.arrow_forward_ios, size: screenWidth * 0.04),
-            onPressed: () => Get.to(() => UnitDetailScreen(projectUid, widget.userUid)),
-          ),
+          // Text(
+          //   amount,
+          //   style: TextStyle(
+          //     fontSize: screenWidth * 0.04,
+          //   ),
+          // ),
+Text(
+  '₹ $formattedAmount',
+  style: TextStyle(
+    fontSize: screenWidth * 0.03,
+  ),
+),
+
+          SizedBox(width: screenWidth * 0.05),
+          
         ],
       ),
-    );
-  
+    ),
+  );
 }
+
 
   Widget _buildFooterSection(double screenWidth, double screenHeight) {
     return Container(

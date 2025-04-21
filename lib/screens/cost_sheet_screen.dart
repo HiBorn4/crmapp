@@ -1,14 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../controllers/cost_sheet_controller.dart';
+import '../controllers/unit_controller.dart';
 import '../models/cost_item_model.dart';
 import '../models/payment_entry_model.dart';
 import '../models/quick_action_model.dart';
+import '../utils/amount_formatting.dart';
 import '../utils/app_colors.dart';
+import '../utils/responsive.dart';
+import '../widgets/payment_schedule.dart';
 
-class CostSheetScreen extends StatelessWidget {
-  final CostSheetController _controller = Get.put(CostSheetController());
+// ignore: must_be_immutable
+class CostSheetScreen extends StatefulWidget {
+  final String projectUid;
+  final String userUid;
+
+  CostSheetScreen(this.projectUid, this.userUid);
+
+  
+  @override
+  State<CostSheetScreen> createState() => _CostSheetScreenState();
+}
+
+class _CostSheetScreenState extends State<CostSheetScreen> {
+ late UnitController _controller;
+
+ @override
+  void initState() {
+    super.initState();
+    _controller = Get.put(
+      UnitController(userUid: widget.userUid, projectUid: widget.projectUid),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,11 +50,34 @@ class CostSheetScreen extends StatelessWidget {
         child: Column(
           children: [
             _buildTotalUnitCost(screenWidth, screenHeight),
-            _buildSection('PLOT', _controller.plcItems, screenWidth, screenHeight),
-            _buildSection('ADDITIONAL CHARGES', _controller.additionalCharges, screenWidth, screenHeight),
-            _buildSection('CONSTRUCTION CHARGES', _controller.constructionCharges, screenWidth, screenHeight),
-            _buildSection('CONSTRUCTION ADDITIONAL CHARGES', _controller.constructionAdditional, screenWidth, screenHeight),
-            _buildPossessionSection(screenWidth, screenHeight),
+            _buildSection(
+  'Additional Charges',
+  _controller.additionalCharges,
+  screenWidth,
+  screenHeight,
+  _controller.tA.value,  // Access the value using .value
+),
+_buildSection(
+  'Construction Charges',
+  _controller.constructionCharges,
+  screenWidth,
+  screenHeight,
+  _controller.tB.value,  // Access the value using .value
+),
+_buildSection(
+  'Construction Additional Charges',
+  _controller.constructionAdditionalCharges,
+  screenWidth,
+  screenHeight,
+  _controller.tC.value,  // Access the value using .value
+),
+_buildSection(
+  'Possession Charges',
+  _controller.possessionCharges,
+  screenWidth,
+  screenHeight,
+  _controller.tD.value,  // Access the value using .value
+),
             _buildPaymentList(screenWidth, screenHeight),
             _buildQuickActionsSection(screenWidth, screenHeight),
           ],
@@ -63,28 +114,43 @@ class CostSheetScreen extends StatelessWidget {
   }
 
   Widget _buildTotalUnitCost(double screenWidth, double screenHeight) {
-    return Column(
-      children: [
-        Text(
-          'TOTAL BALANCE',
-          style: TextStyle(
-            fontSize: screenHeight * 0.018,
-            color: Colors.grey,
-          ),
+  return Column(
+    children: [
+      Text(
+        'TOTAL BALANCE',
+        style: TextStyle(
+          fontSize: screenHeight * 0.018,
+          color: Colors.grey,
         ),
-        SizedBox(height: screenHeight * 0.01),
-        Text(
-          '₹ 1,11,32,000',
-          style: TextStyle(
-            fontSize: screenHeight * 0.035,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    );
-  }
+      ),
+      SizedBox(height: screenHeight * 0.01),
 
-  Widget _buildSection(String title, List<CostItem> items, double screenWidth, double screenHeight) {
+      // 👇 Animated amount transition
+      Obx(() => TweenAnimationBuilder<double>(
+            tween: Tween<double>(begin: 0, end: _controller.totalAmount.value),
+            duration: const Duration(seconds: 2),
+            builder: (context, value, _) {
+              return Text(
+                formatIndianCurrency(value),
+                style: TextStyle(
+                  fontSize: screenHeight * 0.035,
+                  fontWeight: FontWeight.bold,
+                ),
+              );
+            },
+          )),
+    ],
+  );
+}
+
+
+  Widget _buildSection(
+  String title,
+  List<CostItem> items,
+  double screenWidth,
+  double screenHeight,
+  double total,
+) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -104,10 +170,11 @@ class CostSheetScreen extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: screenHeight * 0.02),
         child: Column(
           children: [
-            // _buildDashedDivider(),
-            ...items.map((item) => _buildCostItem(item, screenWidth, screenHeight)),
+            ...items.map(
+              (item) => _buildCostItem(item, screenWidth, screenHeight),
+            ),
             _buildDashedDivider(),
-            _buildTotalRow(screenWidth, screenHeight),
+            _buildTotalRow(screenWidth, screenHeight, total),
           ],
         ),
       ),
@@ -176,102 +243,107 @@ Widget _buildDashedDivider() {
   );
 }
 
+  Widget _buildTotalRow(
+  double screenWidth,
+  double screenHeight,
+  double total,
+) {
+  return Padding(
+    padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          'Total',
+          style: TextStyle(
+            fontSize: screenHeight * 0.018,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          formatIndianCurrency(total),
+          style: TextStyle(
+            fontSize: screenHeight * 0.018,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
-  Widget _buildTotalRow(double screenWidth, double screenHeight) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  // Widget _buildPaymentList(double screenWidth, double screenHeight) {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Padding(
+  //         padding: EdgeInsets.only(bottom: screenHeight * 0.01),
+  //         child: Text(
+  //           'Payment Schedule',
+  //           style: TextStyle(
+  //             fontSize: screenHeight * 0.016,
+  //             fontWeight: FontWeight.bold,
+  //             color: Colors.black,
+  //           ),
+  //         ),
+  //       ),
+  //       ListView.builder(
+  //         shrinkWrap: true,
+  //         physics: NeverScrollableScrollPhysics(),
+  //         itemCount: _controller.payments.length,
+  //         itemBuilder: (context, index) => _buildPaymentItem(
+  //           screenWidth,
+  //           screenHeight,
+  //           _controller.payments[index],
+  //         ),
+  //       ),
+  //       Align(
+  //         alignment: Alignment.bottomRight,
+  //         child: Padding(
+  //           padding: EdgeInsets.only(top: screenHeight * 0.01, right: screenWidth * 0.05),
+  //           child: Text(
+  //             'View All',
+  //             style: TextStyle(
+  //               fontSize: screenHeight * 0.018,
+  //               color: Colors.black,
+  //               decoration: TextDecoration.underline,
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
+
+  Widget _buildPaymentList(double screenWidth, double screenHeight) {
+    return Obx(
+      () => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Total',
-              style: TextStyle(
-                fontSize: screenHeight * 0.018,
-                fontWeight: FontWeight.bold,
-              )),
-          Text('₹ 87,000',
-              style: TextStyle(
-                fontSize: screenHeight * 0.018,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              )),
+          Text(
+            'PAYMENT SCHEDULE',
+            style: TextStyle(
+              fontSize: Responsive.getFontSize(screenWidth, 14),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: screenWidth * 0.03),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: _controller.payments.length,
+            itemBuilder:
+                (context, index) => PaymentScheduleWidget(
+                  screenWidth: screenWidth,
+                  screenHeight: screenHeight,
+                  payment: _controller.payments[index],
+                ),
+          ),
         ],
       ),
     );
   }
-
-  Widget _buildPossessionSection(double screenWidth, double screenHeight) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        _buildSection('POSSESSION CHARGES', _controller.possessionCharges, screenWidth, screenHeight),
-        Padding(
-          padding: EdgeInsets.only(top: screenHeight * 0.02, bottom: screenHeight*0.01),
-          child: Container(
-            height: screenHeight*0.05,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.black),
-              color: Colors.white,
-            ),
-            child: TextButton(
-              onPressed: _downloadCostSheet,
-              child: Text(
-                'Download',
-                style: TextStyle(
-                  fontSize: screenHeight * 0.018,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPaymentList(double screenWidth, double screenHeight) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(bottom: screenHeight * 0.01),
-          child: Text(
-            'Payment Schedule',
-            style: TextStyle(
-              fontSize: screenHeight * 0.016,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: _controller.paymentEntries.length,
-          itemBuilder: (context, index) => _buildPaymentItem(
-            screenWidth,
-            screenHeight,
-            _controller.paymentEntries[index],
-          ),
-        ),
-        Align(
-          alignment: Alignment.bottomRight,
-          child: Padding(
-            padding: EdgeInsets.only(top: screenHeight * 0.01, right: screenWidth * 0.05),
-            child: Text(
-              'View All',
-              style: TextStyle(
-                fontSize: screenHeight * 0.018,
-                color: Colors.black,
-                decoration: TextDecoration.underline,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
 
   Widget _buildPaymentItem(double screenWidth, double screenHeight, PaymentEntry payment) {
     return Container(
@@ -435,9 +507,6 @@ Widget _buildDashedDivider() {
     );
   }
 
-
-
-
   Widget _buildQuickActionsSection(double screenWidth, double screenHeight) {
     return 
     // Obx(() => 
@@ -470,7 +539,6 @@ Widget _buildDashedDivider() {
     // );
   }
 
-
   Widget _buildQuickActionItem(double screenWidth, double screenHeight, QuickActionModel action) {
     return Container(
       margin: EdgeInsets.all(screenWidth*0.01),
@@ -498,5 +566,4 @@ Widget _buildDashedDivider() {
   void _downloadCostSheet() {
     // Implement download logic
   }
-
 }

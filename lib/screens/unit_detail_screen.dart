@@ -1,4 +1,5 @@
 import 'package:crmapp/screens/cost_sheet_screen.dart';
+import 'package:crmapp/screens/modification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_direct_caller_plugin/flutter_direct_caller_plugin.dart';
 import 'package:get/get.dart';
@@ -10,6 +11,9 @@ import '../widgets/dimension_graph_chart.dart';
 import '../utils/responsive.dart';
 import '../widgets/donut_chart.dart';
 import '../widgets/payment_schedule.dart';
+  import 'package:intl/intl.dart';
+
+import 'payment_schedule_screen.dart';
 
 class UnitDetailScreen extends StatefulWidget {
   final String projectUid;
@@ -67,18 +71,36 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
 
             SizedBox(height: screenHeight * 0.03),
 
-            _buildSection(
-              'PLOT',
-              _controller.plcItems,
-              screenWidth,
-              screenHeight,
-            ),
-            _buildSection(
-              'PLOT',
-              _controller.plcItems,
-              screenWidth,
-              screenHeight,
-            ),
+_buildSection(
+  'Additional Charges',
+  _controller.additionalCharges,
+  screenWidth,
+  screenHeight,
+  _controller.tA.value,  // Access the value using .value
+),
+_buildSection(
+  'Construction Charges',
+  _controller.constructionCharges,
+  screenWidth,
+  screenHeight,
+  _controller.tB.value,  // Access the value using .value
+),
+_buildSection(
+  'Construction Additional Charges',
+  _controller.constructionAdditionalCharges,
+  screenWidth,
+  screenHeight,
+  _controller.tC.value,  // Access the value using .value
+),
+_buildSection(
+  'Possession Charges',
+  _controller.possessionCharges,
+  screenWidth,
+  screenHeight,
+  _controller.tD.value,  // Access the value using .value
+),
+
+
 
             _buildApplicantDetails(context, _tabController),
 
@@ -129,15 +151,15 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
           SizedBox(height: screenWidth * 0.03),
 
           // Center-Aligned Tab Switcher
-          Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
+          Row(
+              // mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildTab('Stage Balance', 0, selectedTab, screenWidth),
                 _buildTab('Unit Cost', 1, selectedTab, screenWidth),
               ],
             ),
-          ),
+          
           SizedBox(height: screenWidth * 0.04),
 
           // Content Card
@@ -151,7 +173,8 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
             child:
                 selectedTab.value == 0
                     ? _buildStageBalance(screenWidth, _controller)
-                    : _buildUnitCost(screenWidth, _controller),
+                    : _buildStageBalance(screenWidth, _controller),
+            // _buildUnitCost(screenWidth, _controller),
           ),
         ],
       ),
@@ -173,7 +196,7 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
       },
       child: Padding(
         padding: EdgeInsets.symmetric(
-          horizontal: screenWidth * 0.05,
+          // horizontal: screenWidth * 0.05,
           vertical: screenWidth * 0.015,
         ),
         child: Column(
@@ -217,120 +240,114 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
     );
   }
 
-  // Widget for Stage Balance
+
+String formatIndianCurrency(double amount) {
+  final roundedAmount = amount.round();
+  final format = NumberFormat.currency(
+    locale: 'en_IN',
+    symbol: '₹',
+    decimalDigits: 0,
+  );
+  return format.format(roundedAmount);
+}
+
+
   Widget _buildStageBalance(double screenWidth, UnitController _controller) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Combined title with legends
+        SizedBox(height: screenWidth * 0.03),
         Row(
-          crossAxisAlignment:
-              CrossAxisAlignment.start, // Aligns donut and amounts properly
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Donut Chart (Eligible = Grey, Paid = Light Lavender)
             SizedBox(width: screenWidth * 0.08),
             Expanded(
               flex: 2,
-              child: Column(
-                children: [
-                  DonutChart(
-                    paid: _controller.paidAmount.value,
-                    total: _controller.totalAmount.value,
-                    size: screenWidth * 0.35,
-                    paidColor: Color(0XFFDBD3FD), // Paid section color
-                    eligibleColor: Colors.grey[400]!, // Remaining section color
-                  ),
-                  SizedBox(height: screenWidth * 0.05), // Space below donut
-                ],
+              child: DonutChart(
+                paid: _controller.paidAmount.value,
+                total: _controller.totalAmount.value,
+                size: screenWidth * 0.35,
+                paidColor: Color(0XFFDBD3FD),
+                eligibleColor: Colors.grey[400]!,
               ),
             ),
-
-            // Added space between Donut Chart and Amount Details
-            SizedBox(width: screenWidth * 0.2),
-
-            // Amount Details
+            SizedBox(width: screenWidth * 0.15),
             Expanded(
-              flex: 3,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildAmountRow(
-                    'Eligible Cost',
-                    '₹${_controller.totalAmount.value.round()}',
-                    Colors.grey[700]!,
-                  ),
-                  SizedBox(height: screenWidth * 0.02), // Space between rows
-                  _buildAmountRow(
-                    'Paid',
-                    '₹${_controller.paidAmount.value.round()}',
-                    Colors.purple[300]!,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+  flex: 3,
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      SizedBox(width: 10),
+      SizedBox(width: 10),
+      Text("Balance", style: TextStyle(fontSize: 12)),
+      _buildAmountRow(
+        'Balance',
+        formatIndianCurrency(_controller.totalAmount.value - _controller.paidAmount.value),
+        Colors.grey[400]!,
+      ),
+      SizedBox(height: screenWidth * 0.02),
 
-        // Legend (Color Indication) - Now Below the Donut
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            _buildLegendItem(Color(0XFFDBD3FD), 'Paid'),
-            SizedBox(width: screenWidth * 0.06),
-            _buildLegendItem(Colors.grey[400]!, 'Balance'),
+      _legendBox(Colors.grey[700]!, 'Eligible Cost'),
+      _buildAmountRow(
+        'Eligible Cost',
+        formatIndianCurrency(_controller.totalAmount.value),
+        Colors.grey[700]!,
+      ),
+      SizedBox(height: screenWidth * 0.02),
+
+      _legendBox(Color(0XFFDBD3FD), 'Paid'),
+      _buildAmountRow(
+        'Paid',
+        formatIndianCurrency(_controller.paidAmount.value),
+        Colors.purple[300]!,
+      ),
+    ],
+  ),
+),
+
           ],
         ),
       ],
     );
   }
 
-  // Legend Item Widget
-  Widget _buildLegendItem(Color color, String label) {
+  Widget _legendBox(Color color, String label) {
     return Row(
       children: [
         Container(
-          width: 12,
-          height: 12,
+          width: 10,
+          height: 10,
           decoration: BoxDecoration(
             color: color,
-            shape: BoxShape.rectangle, // Changed from circle to square
-            borderRadius: BorderRadius.circular(
-              2,
-            ), // Slightly rounded corners for aesthetics
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(2),
           ),
         ),
-        SizedBox(width: 8),
-        Text(label, style: TextStyle(fontSize: 14)),
+        SizedBox(width: 4),
+        Text(label, style: TextStyle(fontSize: 12)),
       ],
     );
   }
 
-  // Placeholder for Unit Cost section
-  Widget _buildUnitCost(double screenWidth, UnitController _controller) {
-    return Center(
-      child: Text(
-        'Unit Cost Details Coming Soon!',
-        style: TextStyle(fontSize: Responsive.getFontSize(screenWidth, 16)),
-      ),
-    );
-  }
+  // // Placeholder for Unit Cost section
+  // Widget _buildUnitCost(double screenWidth, UnitController _controller) {
+  //   return Center(
+  //     child: Text(
+  //       'Unit Cost Details Coming Soon!',
+  //       style: TextStyle(fontSize: Responsive.getFontSize(screenWidth, 16)),
+  //     ),
+  //   );
+  // }
 
   // Amount Row (Stacked Layout: Label above, Value below)
   Widget _buildAmountRow(String label, String value, Color color) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
+      padding: EdgeInsets.symmetric(vertical: 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 14,
-              fontWeight: FontWeight.w500, // Slightly bold for emphasis
-            ),
-          ),
-
-          SizedBox(height: 4), // Small spacing between label and value
           Text(
             value,
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
@@ -376,7 +393,7 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
         item['customerDetailsObj']?['phoneNo1']?.toString() ?? 'No Contact';
 
     return GestureDetector(
-      onTap: () => Get.to(() => CostSheetScreen()),
+      onTap: () => Get.to(() => ModificationScreen()),
       child: Container(
         margin: EdgeInsets.only(bottom: screenHeight * 0.01),
         padding: EdgeInsets.all(screenWidth * 0.03),
@@ -480,18 +497,14 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
               screenHeight,
               Icons.receipt_long,
               "Cost Sheet",
-              () {
-                Get.toNamed('/cost-sheet');
-              },
+              () => Get.to(() => CostSheetScreen(widget.projectUid, widget.userUid)),
             ),
             _buildCategoryItem(
               screenWidth,
               screenHeight,
               Icons.schedule,
               "Schedule",
-              () {
-                Get.toNamed('/cost-sheet');
-              },
+              () => Get.to(() => PaymentScheduleScreen(widget.projectUid, widget.userUid)),
             ),
             _buildCategoryItem(
               screenWidth,
@@ -499,7 +512,7 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
               Icons.list,
               "Activity",
               () {
-                Get.toNamed('/cost-sheet');
+                Get.toNamed('/activity-log');
               },
             ),
             _buildCategoryItem(
@@ -508,7 +521,7 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
               Icons.build,
               "Modifications",
               () {
-                Get.toNamed('/cost-sheet');
+                Get.toNamed('/modification');
               },
             ),
           ],
@@ -592,7 +605,7 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Padding(
-          padding: EdgeInsets.all(12),
+          padding: EdgeInsets.all(10),
           child: Text(
             'APPLICANT DETAILS',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -622,66 +635,66 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
   }
 
   Widget buildApplicantCard() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Card(
-        color: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Image
-              Container(
-                height: 70,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  image: const DecorationImage(
-                    image: AssetImage('assets/primary.png'),
-                    fit: BoxFit.cover,
-                  ),
+    return Card(
+      elevation: 0,
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero, // 🔺 Sharp corners
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image
+            Container(
+              height: 70,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.zero, // 🔺 Sharp image corners
+                image: const DecorationImage(
+                  image: AssetImage('assets/primary.png'),
+                  fit: BoxFit.cover,
                 ),
               ),
-              const SizedBox(height: 16),
+            ),
+            const SizedBox(height: 16),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  buildInfoLine("S/O", _controller.name),
-                  buildInfoLine("Pan Card", _controller.panNo),
-                ],
-              ),
-              const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                buildInfoLine("S/O", _controller.name),
+                buildInfoLine("Pan Card", _controller.panNo),
+              ],
+            ),
+            const SizedBox(height: 10),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  buildInfoLine("Marital Status", _controller.maritalStatus),
-                  buildInfoLine("Aadhar Number", _controller.aadharNo),
-                ],
-              ),
-              const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                buildInfoLine("Marital Status", _controller.maritalStatus),
+                buildInfoLine("Aadhar Number", _controller.aadharNo),
+              ],
+            ),
+            const SizedBox(height: 10),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  buildInfoLine("DOB", _controller.dob),
-                  buildInfoLine("Secondary No", _controller.mobile),
-                ],
-              ),
-              const Divider(height: 25, thickness: 1),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                buildInfoLine("DOB", _controller.dob),
+                buildInfoLine("Secondary No", _controller.mobile),
+              ],
+            ),
+            const Divider(height: 25, thickness: 1),
 
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  buildInfoLine("Current Address", _controller.currentAdd),
-                  buildInfoLine("Permanent Address", _controller.permAdd),
-                ],
-              ),
-            ],
-          ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                buildInfoLine("Current Address", _controller.currentAdd),
+                buildInfoLine("Permanent Address", _controller.permAdd),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -797,42 +810,43 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
   }
 
   Widget _buildSection(
-    String title,
-    List<CostItem> items,
-    double screenWidth,
-    double screenHeight,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
-          child: Text(
-            title,
-            style: TextStyle(
-              fontSize: screenHeight * 0.016,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+  String title,
+  List<CostItem> items,
+  double screenWidth,
+  double screenHeight,
+  double total,
+) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Padding(
+        padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
+        child: Text(
+          title,
+          style: TextStyle(
+            fontSize: screenHeight * 0.016,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+      ),
+      Container(
+        color: Colors.white,
+        padding: EdgeInsets.symmetric(horizontal: screenHeight * 0.02),
+        child: Column(
+          children: [
+            ...items.map(
+              (item) => _buildCostItem(item, screenWidth, screenHeight),
             ),
-          ),
+            _buildDashedDivider(),
+            _buildTotalRow(screenWidth, screenHeight, total),
+          ],
         ),
+      ),
+    ],
+  );
+}
 
-        Container(
-          color: Colors.white,
-          padding: EdgeInsets.symmetric(horizontal: screenHeight * 0.02),
-          child: Column(
-            children: [
-              ...items.map(
-                (item) => _buildCostItem(item, screenWidth, screenHeight),
-              ),
-              _buildDashedDivider(),
-              _buildTotalRow(screenWidth, screenHeight),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildDashedDivider() {
     return Padding(
@@ -856,29 +870,34 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
     );
   }
 
-  Widget _buildTotalRow(double screenWidth, double screenHeight) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Total',
-            style: TextStyle(
-              fontSize: screenHeight * 0.018,
-              fontWeight: FontWeight.bold,
-            ),
+  Widget _buildTotalRow(
+  double screenWidth,
+  double screenHeight,
+  double total,
+) {
+  return Padding(
+    padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          'Total',
+          style: TextStyle(
+            fontSize: screenHeight * 0.018,
+            fontWeight: FontWeight.bold,
           ),
-          Text(
-            '₹ 87,000',
-            style: TextStyle(
-              fontSize: screenHeight * 0.018,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
+        ),
+        Text(
+          formatIndianCurrency(total),
+          style: TextStyle(
+            fontSize: screenHeight * 0.018,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
+
 }

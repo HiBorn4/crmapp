@@ -1,3 +1,4 @@
+import 'package:crmapp/utils/amount_formatting.dart';
 import 'package:flutter/material.dart';
 
 import '../models/payment_entry_model.dart';
@@ -20,6 +21,31 @@ class PaymentScheduleWidget extends StatefulWidget {
 }
 
 class _PaymentScheduleWidgetState extends State<PaymentScheduleWidget> {
+
+
+  String formatAmount(String rawAmount) {
+  // Remove ₹ and commas, then trim any spaces
+  final cleaned = rawAmount.replaceAll('₹', '').replaceAll(',', '').trim();
+
+  // Parse, round off, and format
+  final amount = double.parse(cleaned).round();
+  final formatted = _formatIndianCurrency(amount);
+
+  return '₹$formatted';
+}
+
+/// Indian number format logic (e.g. 1,23,456)
+String _formatIndianCurrency(int amount) {
+  String amt = amount.toString();
+  if (amt.length <= 3) return amt;
+
+  String last3 = amt.substring(amt.length - 3);
+  String rest = amt.substring(0, amt.length - 3);
+
+  final reg = RegExp(r'(\d)(?=(\d\d)+\d$)');
+  rest = rest.replaceAllMapped(reg, (Match m) => "${m[1]},");
+  return "$rest,$last3";
+}
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -110,7 +136,7 @@ class _PaymentScheduleWidgetState extends State<PaymentScheduleWidget> {
               /// Amount with optional line-through
               RichText(
                 text: TextSpan(
-                  text: widget.payment.amount,
+                  text: formatAmount(widget.payment.amount),
                   style: TextStyle(
                     fontSize: widget.screenHeight * 0.018,
                     color: Colors.black,
@@ -121,7 +147,7 @@ class _PaymentScheduleWidgetState extends State<PaymentScheduleWidget> {
                   ),
                   children: [
                     TextSpan(
-                      text: ' Inc GST',
+                      text: '  Inc GST',
                       style: TextStyle(
                         fontSize: widget.screenHeight * 0.015,
                         color: Colors.grey,
@@ -172,7 +198,7 @@ class _PaymentScheduleWidgetState extends State<PaymentScheduleWidget> {
                       widget.payment.status == 'DUE TODAY' ? 'Pay Now' : 'Pay in Adv',
                       style: TextStyle(
                         fontSize: widget.screenHeight * 0.016,
-                        color: AppColors.primaryColor,
+                        color: Colors.black,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
