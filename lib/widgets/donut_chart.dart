@@ -95,7 +95,7 @@ paint.color = Colors.grey[300]!;
 canvas.drawCircle(center, radius, paint);
 
 // Draw eligible balance (Lavender)
-paint.color = Colors.purple[200]!;
+paint.color = Color(0XFFDBD3FD);
 canvas.drawArc(
   Rect.fromCircle(center: center, radius: radius),
   -math.pi / 2,

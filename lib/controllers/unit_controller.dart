@@ -1,5 +1,7 @@
 // ignore_for_file: invalid_use_of_protected_member, avoid_print
 
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -23,8 +25,34 @@ class UnitController extends GetxController {
   final RxString orgName = ''.obs;
   final RxMap<String, dynamic> projectData = <String, dynamic>{}.obs;
   final RxList<Map<String, String>> applicantInfo = <Map<String, String>>[].obs;
-  final RxList<Map<String, dynamic>> paymentSchedule = <Map<String, dynamic>>[].obs;
-  final RxList<Map<String, String>> costSheetItems = <Map<String, String>>[].obs;
+  // Payment schedule will be stored as a reactive list of maps
+  final RxList<Map<String, dynamic>> paymentSchedule =
+      <Map<String, dynamic>>[].obs;
+  final RxList<Map<String, String>> costSheetItems =
+      <Map<String, String>>[].obs;
+    // Dummy data for testing if needed (remove if using live data)
+  final RxList<PaymentEntry> payments = <PaymentEntry>[].obs;
+
+  String name = '';
+  String dob = '';
+  String maritalStatus = '';
+  String mobile = '';
+  String address = '';
+  String altMobile = '';
+  String panNo = '';
+  String aadharNo = '';
+  String currentAdd = '';
+  String permAdd = '';
+
+  final List<CostItem> plcItems = [
+    CostItem('Unit cost', '1,32,000 sqft', '₹ 1,32,000'),
+    CostItem('PLC', '0 sqft', '₹ 1,32,00'),
+    CostItem('PLC', '0 sqft', '₹ 0'),
+  ];
+
+  // Unit Summary reactive values
+  final totalAmount = 0.0.obs;
+  final paidAmount = 0.0.obs;
 
   @override
   void onInit() {
@@ -54,7 +82,7 @@ class UnitController extends GetxController {
     }
   }
 
-  /// Fetch **Project Details** from `<orgName>_units` collection
+  /// Fetch Project Details from `<orgName>_units` collection using projectUid
   Future<void> fetchProjectDetails() async {
     if (orgName.value.isEmpty) {
       print("Error: orgName is empty, cannot fetch project details.");
@@ -68,8 +96,23 @@ class UnitController extends GetxController {
 
       if (projectDoc.exists) {
         projectData.value = projectDoc.data() as Map<String, dynamic>;
-        _parseProjectData();
-        print('Project Details: ${projectData.value}');
+
+        //         void _printLongText(String text) {
+        //   const chunkSize = 800;
+        //   for (var i = 0; i < text.length; i += chunkSize) {
+        //     final chunk = text.substring(i, i + chunkSize > text.length ? text.length : i + chunkSize);
+        //     print(chunk);
+        //   }
+        // }
+
+        // Then use:
+        // final safeProjectData = _sanitizeForJson(projectData);
+        // final formattedJson = const JsonEncoder.withIndent('  ').convert(safeProjectData);
+        // _printLongText('\n📦 Formatted Project Data for ID: $projectUid\n$formattedJson');
+
+        _parseUnitSummaryData();
+        _parsePaymentData();
+        getApplicantDetailsFromProject();
       } else {
         print('Project details not found.');
       }
@@ -78,214 +121,198 @@ class UnitController extends GetxController {
     }
   }
 
+  //   dynamic _sanitizeForJson(dynamic input) {
+  //   if (input is Map) {
+  //     return input.map((key, value) => MapEntry(key, _sanitizeForJson(value)));
+  //   } else if (input is List) {
+  //     return input.map(_sanitizeForJson).toList();
+  //   } else if (input is double && (input.isNaN || input.isInfinite)) {
+  //     return null;
+  //   } else {
+  //     return input;
+  //   }
+  // }
+
   
 
-  void _parseProjectData() {
-    // Parse applicant info
-    applicantInfo.value = [
-      {'label': 'NAME', 'value': projectData['customerDetailsObj']?['customerName1'] ?? 'N/A'},
-      {'label': 'DOB', 'value': _formatDate(projectData['dob'])},
-      {'label': 'MARITAL STATUS', 'value': projectData['maritalStatus'] ?? 'N/A'},
-      {'label': 'MOBILE', 'value': projectData['customerDetailsObj']?['phoneNo1'] ?? 'N/A'},
-      {'label': 'ADDRESS', 'value': projectData['address'] ?? 'N/A'},
-      {'label': 'ALT MOBILE', 'value': projectData['alternatePhone'] ?? 'N/A'},
-    ];
+  void _parseUnitSummaryData() {
+    double eligibleCost = 0;
+    double paid = 0;
+    double balance = 0;
 
-    // Parse payment schedule
-    paymentSchedule.value = (projectData['paymentSchedule'] as List<dynamic>?)?.map((item) {
-      return {
-        'number': item['index'],
-        'date': _formatDate(item['dueDate']),
-        'description': item['description'],
-        'amount': '₹ ${_formatCurrency(item['amount'])}',
-        'status': item['status'],
-        'statusColor': _getStatusColor(item['status'])
-      };
-    }).toList() ?? [];
+    eligibleCost += (projectData.value["T_elgible"] ?? 0).toDouble();
+    paid += (projectData.value["T_review"] ?? 0).toDouble();
+    balance += (projectData.value["T_elgible_balance"] ?? 0).toDouble();
 
-    // Parse cost sheet
-    // costSheetItems.value = (projectData['costSheet'] as List<dynamic>?)?.map((item) {
-    //   return {
-    //     'label': item['description'],
-    //     'value': '₹ ${_formatCurrency(item['amount'])}'
-    //   };
-    // }).toList() ?? [];
+    totalAmount.value = eligibleCost;
+    paidAmount.value = paid;
+
+    print("Eligible Cost: $eligibleCost");
+    print("Paid: $paid");
+    print("Balance: $balance");
   }
 
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'received': return Colors.green;
-      case 'delayed': return Colors.orange;
-      case 'due': return Colors.yellow;
-      default: return Colors.grey;
+  void _parsePaymentData() {
+    if (projectData.value.containsKey("fullPs")) {
+      var fullPs = projectData.value["fullPs"];
+      if (fullPs is List &&
+          fullPs.isNotEmpty &&
+          fullPs[0] is Map<String, dynamic>) {
+        List<Map<String, dynamic>> allSchedules = [];
+
+        for (int index = 0; index < fullPs.length; index++) {
+          var item = fullPs[index];
+
+          String dateStr =
+              item["schDate"]?.toString() ?? item["oldDate"]?.toString() ?? '';
+          String formattedDate = _formatDate(dateStr);
+          String amountStr = "₹ ${_formatCurrency(item["value"] ?? 0)}";
+
+          int outstanding =
+              item["outstanding"] ?? 1; // Assuming unpaid by default
+          String status;
+          Color statusColor;
+
+          DateTime? scheduledDate;
+          try {
+            if (dateStr.isNotEmpty) {
+              scheduledDate = DateTime.fromMillisecondsSinceEpoch(
+                int.parse(dateStr),
+              );
+            }
+          } catch (e) {
+            scheduledDate = null;
+          }
+
+          DateTime today = DateTime.now();
+          if (outstanding == 0) {
+            status = "PAID";
+            statusColor = Colors.green;
+          } else if (scheduledDate != null && scheduledDate.isAfter(today)) {
+            status = "UPCOMING";
+            statusColor = Colors.orange;
+          } else if (scheduledDate != null && scheduledDate.isBefore(today)) {
+            status = "DUE TODAY";
+            statusColor = Colors.red;
+          } else {
+            status = "PENDING";
+            statusColor = Colors.grey;
+          }
+
+          allSchedules.add({
+            'number': (index + 1).toString().padLeft(2, '0'),
+            'date': formattedDate,
+            'description': item["label"] ?? '',
+            'amount': amountStr,
+            'status': status,
+            'statusColor': statusColor,
+          });
+        }
+
+        paymentSchedule.value = allSchedules;
+        payments.value =
+            allSchedules.map((entry) => PaymentEntry.fromJson(entry)).toList();
+
+        print("\n📅 Parsed Payment Schedule Entries:");
+        for (var item in allSchedules) {
+          print('--------------------------------');
+          print('🔢 No: ${item['number']}');
+          print('📆 Date: ${item['date']}');
+          print('📝 Description: ${item['description']}');
+          print('💰 Amount: ${item['amount']}');
+          print('📌 Status: ${item['status']}');
+        }
+      } else {
+        print("fullPs format is unexpected or empty.");
+      }
+    } else {
+      print("fullPs not found in project data.");
     }
   }
 
+  // Helper: Format date string (customize as needed)
   String _formatDate(dynamic date) {
     if (date is Timestamp) {
-      // return DateFormat('dd, MMM, y').format(date.toDate());
+      // Use your preferred date format here
+      return date.toDate().toString();
     }
-    return date?.toString() ?? 'N/A';
+    if (date is String && date.isNotEmpty) {
+      try {
+        DateTime parsedDate = DateTime.parse(date);
+        // Customize format if needed, for now returning in 'dd, MMM, yyyy'
+        return "${parsedDate.day}, ${_getMonthName(parsedDate.month)}, ${parsedDate.year}";
+      } catch (e) {
+        return date;
+      }
+    }
+    return 'N/A';
   }
 
+  // Helper: Format currency
   String _formatCurrency(dynamic amount) {
     if (amount is num) {
-      return amount.toStringAsFixed(2).replaceAllMapped(
-        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-        (Match m) => '${m[1]},',
-      );
+      return amount
+          .toStringAsFixed(2)
+          .replaceAllMapped(
+            RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+            (Match m) => '${m[1]},',
+          );
     }
     return '0.00';
   }
 
-  final payments = <PaymentEntry>[
-    PaymentEntry(
-      number: '01',
-      date: '22, Feb, 2025',
-      description: 'On Booking',
-      amount: '₹ 1,32,000',
-      status: 'RECEIVED',
-      statusColor: Colors.green,
-    ),
-    PaymentEntry(
-      number: '02',
-      date: '15, Mar, 2025',
-      description: 'On execution of Agreement',
-      amount: '₹ 2,50,000',
-      status: 'DUE TODAY',
-      statusColor: Colors.red,
-    ),
-    PaymentEntry(
-      number: '03',
-      date: '10, Apr, 2025',
-      description: 'On Completion of Plinth',
-      amount: '₹ 3,75,000',
-      status: 'DUE IN 3 DAYS',
-      statusColor: Colors.green,
-    ),
-    PaymentEntry(
-      number: '04',
-      date: '05, May, 2025',
-      description: 'On Completion of 1st Floor',
-      amount: '₹ 4,00,000',
-      status: 'DUE IN 3 DAYS',
-      statusColor: Colors.green,
-    ),
-    PaymentEntry(
-      number: '05',
-      date: '20, Jun, 2025',
-      description: 'On Completion of 2nd Floor',
-      amount: '₹ 4,25,000',
-      status: 'UPCOMING',
-      statusColor: Colors.orange,
-    ),
-  ].obs;
+  // Helper: Convert month number to month name
+  String _getMonthName(int month) {
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return months[month - 1];
+  }
 
-  final List<CostItem> plcItems = [
-    CostItem('Unit cost', '1,32,000 sqft', '₹ 1,32,000'),
-    CostItem('PLC', '0 sqft', '₹ 0'),
-  ];
 
-  // Unit Summary
-  final totalAmount = 100000.0.obs;
-  final paidAmount = 75000.0.obs;
 
-  // Documents
-  final documents = <DocumentModel>[
-    DocumentModel(
-        icon: Icons.description,
-        name: 'Agreement',
-        date: '12/2/25',
-        fileSize: '0.3 MB'),
-    DocumentModel(
-        icon: Icons.file_copy,
-        name: 'Blueprint',
-        date: '15/2/25',
-        fileSize: '1.2 MB'),
-    DocumentModel(
-        icon: Icons.picture_as_pdf,
-        name: 'Payment Receipt',
-        date: '20/2/25',
-        fileSize: '0.5 MB'),
-    DocumentModel(
-        icon: Icons.article,
-        name: 'Project Plan',
-        date: '22/2/25',
-        fileSize: '2.0 MB'),
-    DocumentModel(
-        icon: Icons.folder,
-        name: 'Legal Docs',
-        date: '28/2/25',
-        fileSize: '0.8 MB'),
-  ].obs;
+  
+  void getApplicantDetailsFromProject() {
+  final customerList = projectData['customerDetailsObj'];
+  print("📋 Raw customerDetailsObj:");
+  print(projectData['customerDetailsObj']);
 
-  // Attention Items
-  final attentionItems = [
-    UnitModel(
-      unitNo: '131',
-      amount: '1,32,000',
-      daysLeft: '3',
-      name: '',
-      user: '',
-      due: '',
-    ),
-    UnitModel(
-      unitNo: '152',
-      amount: '2,50,000',
-      daysLeft: '5',
-      name: '',
-      user: '',
-      due: '',
-    ),
-  ];
+  final firstCustomer = (customerList is List && customerList.isNotEmpty)
+      ? customerList.first
+      : {};
 
-  // Transactions
-  final transactions = <TransactionModel>[
-    TransactionModel(
-      icon: Icons.construction,
-      name: 'Plastering',
-      amount: 100000,
-      details: 'Agreement - Shuba Ecovillony',
-      date: '02 Mar',
-    ),
-    TransactionModel(
-      icon: Icons.build,
-      name: 'Wiring',
-      amount: 50000,
-      details: 'Electrical - Tower B',
-      date: '10 Mar',
-    ),
-    TransactionModel(
-      icon: Icons.plumbing,
-      name: 'Plumbing',
-      amount: 75000,
-      details: 'Pipelines - Basement A',
-      date: '15 Mar',
-    ),
-    TransactionModel(
-      icon: Icons.home_repair_service,
-      name: 'Tiles Work',
-      amount: 120000,
-      details: 'Flooring - Phase 1',
-      date: '18 Mar',
-    ),
-    TransactionModel(
-      icon: Icons.roofing,
-      name: 'Roof Work',
-      amount: 95000,
-      details: 'Roof Installation - Block C',
-      date: '25 Mar',
-    ),
-  ].obs;
+  name = firstCustomer['customerName1']?.toString() ?? 'N/A';
+  dob = _formatDate(firstCustomer['dob1']);
+  maritalStatus = firstCustomer['marital1']?['label']?.toString() ?? 'N/A';
+  mobile = firstCustomer['phoneNo1']?.toString() ?? 'N/A';
+  panNo = firstCustomer['panNo1']?.toString() ?? 'N/A';
+  aadharNo = firstCustomer['aadharNo1']?.toString() ?? 'N/A';
+  currentAdd = firstCustomer['address1']?.toString() ?? 'N/A';
+  permAdd = firstCustomer['aggrementAddress']?.toString() ?? 'N/A';
 
-  // Quick Actions
-  final quickActions = <QuickActionModel>[
-    QuickActionModel(title: 'Civil Sliver', description: 'Modification Request'),
-    QuickActionModel(
-        title: 'Paint Work', description: 'Color Customization Request'),
-    QuickActionModel(title: 'Security Update', description: 'Access Card Activation'),
-    QuickActionModel(
-        title: 'Water Supply', description: 'Request for Additional Connection'),
-    QuickActionModel(title: 'Electrical', description: 'Power Backup Upgrade'),
-  ].obs;
+  // Print the parsed info
+  print('\n🧾 Applicant Info:');
+  print('👤 Name: $name');
+  print('🎂 DOB: $dob');
+  print('💍 Marital Status: $maritalStatus');
+  print('📞 Mobile: $mobile');
+  print('🪪 PAN: $panNo');
+  print('🧾 Aadhar: $aadharNo');
+  print('🏠 Current Address: $currentAdd');
+  print('📜 Permanent Address: $permAdd');
+}
+
+
+
 }

@@ -1,6 +1,5 @@
 // ignore_for_file: invalid_use_of_protected_member, avoid_print
 
-import 'package:crmapp/screens/modification_screen.dart';
 import 'package:crmapp/screens/overview_screen.dart';
 import 'package:crmapp/screens/profile_screen.dart';
 import 'package:crmapp/screens/unit_detail_screen.dart';
@@ -324,10 +323,28 @@ class _HomeContentState extends State<HomeContent> {
     final categoryIndex = controller.selectedCategoryIndex.value;
     
     // Add null check and handle empty state
-    if (controller.categoryData.value.isEmpty || 
-        categoryIndex >= controller.categoryData.value.length) {
-      return Center(child: Text('No data available', style: TextStyle(fontSize: 16)));
-    }
+if (controller.categoryData.value.isEmpty || 
+    categoryIndex >= controller.categoryData.value.length) {
+  return Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Image.asset(
+          'assets/empty.png', // replace with your image path
+          width: 150,
+          height: 150,
+          fit: BoxFit.contain,
+        ),
+        SizedBox(height: 16),
+        Text(
+          'No data available',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      ],
+    ),
+  );
+}
+
     
     final categoryItems = controller.categoryData.value[categoryIndex];
     

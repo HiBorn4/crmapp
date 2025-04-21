@@ -1,5 +1,4 @@
 import 'package:crmapp/screens/search_screen.dart';
-import 'package:crmapp/screens/task_reminder_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -41,8 +40,7 @@ class MyApp extends StatelessWidget {
         Get.put(AuthService());
       }),
       initialRoute: "/",
-      // home: SignupScreen(),
-      home: TaskReminderScreen(),
+      home: SignupScreen(),
       getPages: [
         GetPage(name: '/', page: () => SignupScreen()),
         GetPage(name: '/login', page: () => LoginScreen()),
