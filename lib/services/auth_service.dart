@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService extends GetxService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -66,9 +67,11 @@ Future<String?> signInWithEmailAndPassword(String email, String password) async 
       password: password.trim(),
     );
 
-    await fetchUserData(); // Fetch user data after successful login
-
-    return userCredential.user?.uid; // Return the UID
+    
+await storeLoginTimestamp();
+    await fetchUserData();
+    
+    return userCredential.user?.uid;
   } on FirebaseAuthException catch (e) {
     _handleAuthException(e);
     return null;
@@ -82,15 +85,18 @@ Future<String?> signInWithEmailAndPassword(String email, String password) async 
 
 
   // Sign Out
-  Future<void> signOut() async {
-    try {
-      await _auth.signOut();
-      currentUser.value = null;
-    } catch (e) {
-      errorMessage('Error signing out');
-      rethrow;
-    }
+  // Update signOut method
+Future<void> signOut() async {
+  try {
+    await _auth.signOut();
+    currentUser.value = null;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('loginTimestamp');
+  } catch (e) {
+    errorMessage('Error signing out');
+    rethrow;
   }
+}
 
   // Send Password Reset Email
   Future<void> sendPasswordResetEmail(String email) async {
@@ -166,4 +172,27 @@ Future<String?> signInWithEmailAndPassword(String email, String password) async 
         errorMessage(e.message ?? 'Authentication failed');
     }
   }
+  Future<void> storeLoginTimestamp() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setInt('loginTimestamp', DateTime.now().millisecondsSinceEpoch);
+}
+
+Future<bool> isSessionValid() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('loginTimestamp')) return false;
+    
+    final loginTimestamp = prefs.getInt('loginTimestamp');
+    if (loginTimestamp == null) return false;
+    
+    final difference = DateTime.now()
+        .difference(DateTime.fromMillisecondsSinceEpoch(loginTimestamp));
+    return difference.inHours <= 24; // More readable 24-hour check
+  } catch (e) {
+    debugPrint('Session validation error: $e');
+    return false;
+  }
+}
+
+
 }

@@ -1,15 +1,15 @@
 import 'package:crmapp/screens/search_screen.dart';
+import 'package:crmapp/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/about_screen.dart';
 import 'screens/activity_log_screen.dart';
 import 'screens/change_password_screen.dart';
-import 'screens/cost_sheet_screen.dart';
 import 'screens/document_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/modification_screen.dart';
-import 'screens/payment_schedule_screen.dart';
 import 'screens/refer_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/transaction_detail_screen.dart';
@@ -21,6 +21,13 @@ void main() async {
 
   await Firebase.initializeApp(); // Initialize Firebase
 
+  try {
+    // final prefs = await SharedPreferences.getInstance();
+    print('SharedPreferences initialized successfully');
+  } catch (e) {
+    print('Error initializing SharedPreferences: $e');
+  }
+
   runApp(MyApp());
 }
 
@@ -31,7 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Customer App',
+      title: 'CRM App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -40,7 +47,7 @@ class MyApp extends StatelessWidget {
         Get.put(AuthService());
       }),
       initialRoute: "/",
-      home: SignupScreen(),
+      home: SplashScreen(),
       getPages: [
         GetPage(name: '/', page: () => SignupScreen()),
         GetPage(name: '/login', page: () => LoginScreen()),

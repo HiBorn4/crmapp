@@ -38,6 +38,7 @@ class ProfileController extends GetxController {
       errorMessage('');
 
       DocumentSnapshot userDoc = await _firestore.collection('users').doc(uid).get();
+      
 
       if (userDoc.exists && userDoc.data() != null) {
         Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
@@ -50,6 +51,7 @@ class ProfileController extends GetxController {
         userData.value = {
           'name': userName,
           'role': userRole,
+          'roles': List<String>.from(roles ?? []),
           'email': data['email'] ?? 'No Email',
           'phone': data['perPh'] ?? 'No Phone',
           'company': data['orgName'] ?? 'No Company',

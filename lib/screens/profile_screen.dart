@@ -98,12 +98,13 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      controller.userData['userRole'] ?? 'No Role',
-                      style: TextStyle(
-                        fontSize: screenHeight * 0.016,
-                        color: Colors.grey,
-                      ),
-                    ),
+  (controller.userData['roles'] as List<dynamic>?)?.join(', ') ?? 'No rles',
+  style: TextStyle(
+    fontSize: screenHeight * 0.016,
+    color: Colors.grey,
+  ),
+),
+
                   ],
                 ),
                 IconButton(

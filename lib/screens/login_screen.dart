@@ -25,19 +25,20 @@ class _LoginScreenState extends State<LoginScreen> {
   
 
   void _handleLogin() async {
-    if (!_formKey.currentState!.validate()) return; // Validate form before login
+  if (!_formKey.currentState!.validate()) return;
 
-    String? uid = await _authService.signInWithEmailAndPassword(
-      _emailController.text,
-      _passwordController.text,
-    );
+  String? uid = await _authService.signInWithEmailAndPassword(
+    _emailController.text,
+    _passwordController.text,
+  );
 
-    if (uid != null) {
-      Get.off(() => HomeScreen(userUid: uid)); // Navigate to HomeScreen with UID
-    } else {
-      Get.snackbar('Login Failed', _authService.errorMessage.value);
-    }
+  if (uid != null) {
+    await _authService.storeLoginTimestamp(); // Add this line
+    Get.off(() => HomeScreen(userUid: uid));
+  } else {
+    Get.snackbar('Login Failed', _authService.errorMessage.value);
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           padding: EdgeInsets.only(left: 20, bottom: 30),
                           alignment: Alignment.bottomLeft,
                           child: Text(
-                            "Customer App\nTell us your login\ndetails.",
+                            "CRM App\nTell us your login\ndetails.",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: screenWidth * 0.06,

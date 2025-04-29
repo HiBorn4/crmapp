@@ -12,20 +12,15 @@ import '../utils/responsive.dart';
 import 'package:intl/intl.dart'; // Add this at the top
 
 class HomeScreen extends StatefulWidget {
-
-
   final String userUid;
 
   HomeScreen({required this.userUid});
-  
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
-  
   late HomeController controller;
   int _selectedIndex = 0;
   late List<Widget> _pages;
@@ -33,7 +28,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    controller = Get.put(HomeController(uid: widget.userUid)); // Pass UID to controller
+    controller = Get.put(
+      HomeController(uid: widget.userUid),
+    ); // Pass UID to controller
 
     // Initialize pages after controller is set
     _pages = [
@@ -122,15 +119,14 @@ class _HomeContentState extends State<HomeContent> {
       appBar: AppBar(
         leading: Row(
           children: [
-            SizedBox(width: screenWidth*0.03,),
+            SizedBox(width: screenWidth * 0.03),
             ClipOval(
-                child: Image.asset(
-                  'assets/home_profile.png',
-                  width: screenWidth * 0.11,
-                  height: screenWidth * 0.11,
-                  fit: BoxFit.cover,
-                ),
-              
+              child: Image.asset(
+                'assets/home_profile.png',
+                width: screenWidth * 0.11,
+                height: screenWidth * 0.11,
+                fit: BoxFit.cover,
+              ),
             ),
           ],
         ),
@@ -141,11 +137,10 @@ class _HomeContentState extends State<HomeContent> {
               _getGreetingMessage(),
               style: TextStyle(
                 fontSize: Responsive.getFontSize(screenWidth, 18),
-                
               ),
             ),
             Text(
-              'Vishal',
+              controller.userData['name'] ?? 'Nameless',
               style: TextStyle(
                 fontSize: Responsive.getFontSize(screenWidth, 20),
                 fontWeight: FontWeight.bold,
@@ -162,7 +157,8 @@ class _HomeContentState extends State<HomeContent> {
               color: Colors.grey[100],
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(
-                  horizontal: Responsive.getPadding(screenWidth).horizontal * 0.35,
+                  horizontal:
+                      Responsive.getPadding(screenWidth).horizontal * 0.35,
                   vertical: screenHeight * 0.02,
                 ),
                 child: Column(
@@ -173,9 +169,9 @@ class _HomeContentState extends State<HomeContent> {
                     _buildCategorySection(screenHeight, screenWidth),
                     SizedBox(height: screenHeight * 0.01),
                     // Obx(
-                      // () => 
-                      _buildListItemSection(screenWidth, screenHeight),
-                      // ),
+                    // () =>
+                    _buildListItemSection(screenWidth, screenHeight),
+                    // ),
                   ],
                 ),
               ),
@@ -201,81 +197,94 @@ class _HomeContentState extends State<HomeContent> {
     }
   }
 
-  Widget _buildSummarySection(double screenWidth, double screenHeight, HomeController controller) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        'UNIT SUMMARY',
-        style: TextStyle(fontSize: Responsive.getFontSize(screenWidth, 14)),
-      ),
-      SizedBox(height: screenHeight * 0.015),
-      
-      Obx(() => Row(
-  children: controller.summaryData.asMap().entries.map((entry) {
-    int index = entry.key;
-    var item = entry.value;
-
-    return Expanded(
-      child: SummaryItem(
-        value: item['value']!,
-        label: item['label']!,
-        screenWidth: screenWidth,
-        isFirst: index == 0,
-      ),
-    );
-  }).toList(),
-)),
-    ],
-  );
-}
-
-
-  Widget _buildCategorySection(double screenHeight, double screenWidth) {
-    return 
-    Obx(() => 
-    Column(
+  Widget _buildSummarySection(
+    double screenWidth,
+    double screenHeight,
+    HomeController controller,
+  ) {
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'CATEGORY',
+          'UNIT SUMMARY',
           style: TextStyle(fontSize: Responsive.getFontSize(screenWidth, 14)),
         ),
         SizedBox(height: screenHeight * 0.015),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: controller.categoryData.value.asMap().entries.map((entry) {
-              final index = entry.key;
-              final categoryItems = entry.value;
-              final value = categoryItems.length.toString();
-              final label = _getCategoryLabel(index);
-              return Container(
-                margin: EdgeInsets.only(right: screenWidth * 0.02),
-                child: _buildCategoryItem(
-                  value,
-                  label,
-                  screenWidth,
-                  index,
-                ),
-              );
-            }).toList(),
+
+        Obx(
+          () => Row(
+            children:
+                controller.summaryData.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  var item = entry.value;
+
+                  return Expanded(
+                    child: SummaryItem(
+                      value: item['value']!,
+                      label: item['label']!,
+                      screenWidth: screenWidth,
+                      isFirst: index == 0,
+                    ),
+                  );
+                }).toList(),
           ),
         ),
       ],
-    )
+    );
+  }
+
+  Widget _buildCategorySection(double screenHeight, double screenWidth) {
+    return Obx(
+      () => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'CATEGORY',
+            style: TextStyle(fontSize: Responsive.getFontSize(screenWidth, 14)),
+          ),
+          SizedBox(height: screenHeight * 0.015),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children:
+                  controller.categoryData.value.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final categoryItems = entry.value;
+                    final value = categoryItems.length.toString();
+                    final label = _getCategoryLabel(index);
+                    return Container(
+                      margin: EdgeInsets.only(right: screenWidth * 0.02),
+                      child: _buildCategoryItem(
+                        value,
+                        label,
+                        screenWidth,
+                        index,
+                      ),
+                    );
+                  }).toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   String _getCategoryLabel(int index) {
-    switch(index) {
-      case 0: return 'Booked';
-      case 1: return 'Allotment';
-      case 2: return 'Agreement';
-      case 3: return 'Construction';
-      case 4: return 'Registration';
-      case 5: return 'Possession';
-      default: return 'Category';
+    switch (index) {
+      case 0:
+        return 'Booked';
+      case 1:
+        return 'Allotment';
+      case 2:
+        return 'Agreement';
+      case 3:
+        return 'Construction';
+      case 4:
+        return 'Registration';
+      case 5:
+        return 'Possession';
+      default:
+        return 'Category';
     }
   }
 
@@ -287,164 +296,154 @@ class _HomeContentState extends State<HomeContent> {
   ) {
     return GestureDetector(
       onTap: () => controller.changeCategory(index),
-      child: 
-      Obx(() => 
-      Container(
-        width: screenWidth * 0.23,
-        padding: EdgeInsets.all(screenWidth * 0.02),
-        decoration: BoxDecoration(
-          color: controller.selectedCategoryIndex.value == index 
-              ? Color(0xFFE6E0FA) 
-              : Colors.white,
-        ),
-        child: Column(
-          children: [
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: screenWidth * 0.05,
-                fontWeight: FontWeight.bold,
-                color: controller.selectedCategoryIndex.value == index 
-                    ? Colors.black 
-                    : Colors.grey,
+      child: Obx(
+        () => Container(
+          width: screenWidth * 0.23,
+          padding: EdgeInsets.all(screenWidth * 0.02),
+          decoration: BoxDecoration(
+            color:
+                controller.selectedCategoryIndex.value == index
+                    ? Color(0xFFE6E0FA)
+                    : Colors.white,
+          ),
+          child: Column(
+            children: [
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.05,
+                  fontWeight: FontWeight.bold,
+                  color:
+                      controller.selectedCategoryIndex.value == index
+                          ? Colors.black
+                          : Colors.grey,
+                ),
               ),
-            ),
-            SizedBox(height: screenWidth * 0.01),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: screenWidth * 0.03,
-                color: controller.selectedCategoryIndex.value == index 
-                    ? Colors.black 
-                    : Colors.grey,
+              SizedBox(height: screenWidth * 0.01),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.03,
+                  color:
+                      controller.selectedCategoryIndex.value == index
+                          ? Colors.black
+                          : Colors.grey,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      )
       ),
     );
   }
 
   Widget _buildListItemSection(double screenWidth, double screenHeight) {
-  return Obx(() {
-    final categoryIndex = controller.selectedCategoryIndex.value;
-    
-    // Add null check and handle empty state
-if (controller.categoryData.value.isEmpty || 
-    categoryIndex >= controller.categoryData.value.length) {
-  return Center(
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Image.asset(
-          'assets/empty.png', // replace with your image path
-          width: 150,
-          height: 150,
-          fit: BoxFit.contain,
-        ),
-        SizedBox(height: 16),
-        Text(
-          'No data available',
-          style: TextStyle(fontSize: 16, color: Colors.grey),
-        ),
-      ],
-    ),
-  );
-}
+    return Obx(() {
+      final categoryIndex = controller.selectedCategoryIndex.value;
 
-    
-    final categoryItems = controller.categoryData.value[categoryIndex];
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ListView.separated(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: categoryItems.length,
-          separatorBuilder: (_, __) => SizedBox(height: screenHeight * 0),
-          itemBuilder: (context, index) => _buildListItem(
-            categoryItems[index],
-            screenWidth,
-            screenHeight,
-          ),
-        ),
-      ],
-    );
-  });
-}
-
-  Widget _buildListItem(Map<String, dynamic> item, double screenWidth, double screenHeight) {
-  final unitNo = item['unit_no']?.toString() ?? 'N/A';
-  final name = item['customerDetailsObj']?['customerName1']?.toString() ?? 'N/A';
-  final contact = item['customerDetailsObj']?['phoneNo1']?.toString() ?? 'No Contact';
-  final amount = item['T_total']?.toString() ?? '₹ 0';
-  final projectUid = item['uid']?.toString() ?? 'UID';
-final double parsedAmount = double.tryParse(amount.replaceAll(RegExp(r'[^\d.]'), '')) ?? 0;
-final int roundedAmount = parsedAmount.ceil();
-final formattedAmount = NumberFormat('#,##,##0', 'en_IN').format(roundedAmount);
-
-  return GestureDetector(
-    onTap: () => Get.to(() => UnitDetailScreen(projectUid, widget.userUid)),
-    child: Container(
-      padding: EdgeInsets.all(screenWidth * 0.02),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Column(
+      // Add null check and handle empty state
+      if (controller.categoryData.value.isEmpty ||
+          categoryIndex >= controller.categoryData.value.length) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                width: screenWidth * 0.1,
-                height: screenWidth * 0.1,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(screenWidth * 0.06),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  unitNo,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: screenWidth * 0.035,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+              Image.asset(
+                'assets/empty.png', // replace with your image path
+                width: 150,
+                height: 150,
+                fit: BoxFit.contain,
               ),
-              SizedBox(height: screenHeight * 0.005),
+              SizedBox(height: 16),
               Text(
-                'Unit No',
-                style: TextStyle(
-                  fontSize: screenWidth * 0.035,
-                  color: Colors.grey[600],
-                ),
+                'No data available',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ],
           ),
-          SizedBox(width: screenWidth * 0.04),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        );
+      }
+
+      final categoryItems = controller.categoryData.value[categoryIndex];
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ListView.separated(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: categoryItems.length,
+            separatorBuilder: (_, __) => SizedBox(height: screenHeight * 0),
+            itemBuilder:
+                (context, index) => _buildListItem(
+                  categoryItems[index],
+                  screenWidth,
+                  screenHeight,
+                ),
+          ),
+        ],
+      );
+    });
+  }
+
+  Widget _buildListItem(
+    Map<String, dynamic> item,
+    double screenWidth,
+    double screenHeight,
+  ) {
+    final unitNo = item['unit_no']?.toString() ?? 'N/A';
+    final name =
+        item['customerDetailsObj']?['customerName1']?.toString() ?? 'N/A';
+    final contact =
+        item['customerDetailsObj']?['phoneNo1']?.toString() ?? 'No Contact';
+    final amount = item['T_total']?.toString() ?? '₹ 0';
+    final projectUid = item['uid']?.toString() ?? 'UID';
+    final double parsedAmount =
+        double.tryParse(amount.replaceAll(RegExp(r'[^\d.]'), '')) ?? 0;
+    final int roundedAmount = parsedAmount.ceil();
+    final formattedAmount = NumberFormat(
+      '#,##,##0',
+      'en_IN',
+    ).format(roundedAmount);
+
+    return GestureDetector(
+      onTap: () => Get.to(() => UnitDetailScreen(projectUid, widget.userUid)),
+      child: Container(
+        padding: EdgeInsets.all(screenWidth * 0.02),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 5,
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Column(
               children: [
-                Text(
-                  name,
-                  style: TextStyle(
-                    fontSize: screenWidth * 0.04,
-                    fontWeight: FontWeight.bold,
+                Container(
+                  width: screenWidth * 0.1,
+                  height: screenWidth * 0.1,
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(screenWidth * 0.06),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    unitNo,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: screenWidth * 0.035,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.005),
                 Text(
-                  contact,
+                  'Unit No',
                   style: TextStyle(
                     fontSize: screenWidth * 0.035,
                     color: Colors.grey[600],
@@ -452,28 +451,46 @@ final formattedAmount = NumberFormat('#,##,##0', 'en_IN').format(roundedAmount);
                 ),
               ],
             ),
-          ),
-          // Text(
-          //   amount,
-          //   style: TextStyle(
-          //     fontSize: screenWidth * 0.04,
-          //   ),
-          // ),
-Text(
-  '₹ $formattedAmount',
-  style: TextStyle(
-    fontSize: screenWidth * 0.03,
-  ),
-),
+            SizedBox(width: screenWidth * 0.04),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.04,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.005),
+                  Text(
+                    contact,
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.035,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Text(
+            //   amount,
+            //   style: TextStyle(
+            //     fontSize: screenWidth * 0.04,
+            //   ),
+            // ),
+            Text(
+              '₹ $formattedAmount',
+              style: TextStyle(fontSize: screenWidth * 0.03),
+            ),
 
-          SizedBox(width: screenWidth * 0.05),
-          
-        ],
+            SizedBox(width: screenWidth * 0.05),
+          ],
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Widget _buildFooterSection(double screenWidth, double screenHeight) {
     return Container(
@@ -553,10 +570,26 @@ Text(
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildSocialIcon('assets/whatsapp.png', screenWidth * 0.06, () => _launchWhatsApp()),
-              _buildSocialIcon('assets/insta.png', screenWidth * 0.06, () => _launchInstagram()),
-              _buildSocialIcon('assets/x.png', screenWidth * 0.06, () => _launchTwitter()),
-              _buildSocialIcon('assets/fb.png', screenWidth * 0.06, () => _launchFacebook()),
+              _buildSocialIcon(
+                'assets/whatsapp.png',
+                screenWidth * 0.06,
+                () => _launchWhatsApp(),
+              ),
+              _buildSocialIcon(
+                'assets/insta.png',
+                screenWidth * 0.06,
+                () => _launchInstagram(),
+              ),
+              _buildSocialIcon(
+                'assets/x.png',
+                screenWidth * 0.06,
+                () => _launchTwitter(),
+              ),
+              _buildSocialIcon(
+                'assets/fb.png',
+                screenWidth * 0.06,
+                () => _launchFacebook(),
+              ),
             ],
           ),
         ],
