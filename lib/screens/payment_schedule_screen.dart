@@ -251,6 +251,7 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
                   width: screenWidth * 0.25,
                   height: screenHeight * 0.04,
                   decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.zero),
                     color: Color(0xFFD7C5F4),
                   ),
                   child: TextButton(

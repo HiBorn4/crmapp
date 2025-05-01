@@ -31,7 +31,7 @@ class SummaryItem extends StatelessWidget {
               fontWeight: FontWeight.w900,
             ),
           ),
-          SizedBox(height: 8),
+          SizedBox(height: 2),
           Text(
             label,
             style: TextStyle(
@@ -39,6 +39,7 @@ class SummaryItem extends StatelessWidget {
               color: Colors.grey[800],
             ),
           ),
+          SizedBox(height: 6),
           Icon(Icons.arrow_forward, size: screenWidth * 0.05),
         ],
       ),

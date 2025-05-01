@@ -7,6 +7,7 @@ import 'package:crmapp/screens/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/home_controller.dart';
+import '../utils/tapered_line_painter.dart';
 import '../widgets/summary_item.dart';
 import '../utils/responsive.dart';
 import 'package:intl/intl.dart'; // Add this at the top
@@ -148,13 +149,22 @@ class _HomeContentState extends State<HomeContent> {
             ),
           ],
         ),
+        bottom: PreferredSize(
+      preferredSize: Size.fromHeight(3), // Adjust height as needed
+      child: CustomPaint(
+        painter: TaperedLinePainter(),
+        child: SizedBox(
+          width: double.infinity,
+        ),
+      ),
+    ),
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              color: Colors.grey[100],
+              color: Colors.white,
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(
                   horizontal:
@@ -164,10 +174,11 @@ class _HomeContentState extends State<HomeContent> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    SizedBox(height: screenHeight * 0.015),
                     _buildSummarySection(screenWidth, screenHeight, controller),
                     SizedBox(height: screenHeight * 0.02),
                     _buildCategorySection(screenHeight, screenWidth),
-                    SizedBox(height: screenHeight * 0.01),
+                    SizedBox(height: screenHeight * 0.04),
                     // Obx(
                     // () =>
                     _buildListItemSection(screenWidth, screenHeight),
@@ -207,7 +218,7 @@ class _HomeContentState extends State<HomeContent> {
       children: [
         Text(
           'UNIT SUMMARY',
-          style: TextStyle(fontSize: Responsive.getFontSize(screenWidth, 14)),
+          style: TextStyle(fontSize: Responsive.getFontSize(screenWidth, 14), fontWeight: FontWeight.w500),
         ),
         SizedBox(height: screenHeight * 0.015),
 
@@ -253,7 +264,7 @@ class _HomeContentState extends State<HomeContent> {
                     final value = categoryItems.length.toString();
                     final label = _getCategoryLabel(index);
                     return Container(
-                      margin: EdgeInsets.only(right: screenWidth * 0.02),
+                      margin: EdgeInsets.only(right: screenWidth * 0.03),
                       child: _buildCategoryItem(
                         value,
                         label,
@@ -289,102 +300,120 @@ class _HomeContentState extends State<HomeContent> {
   }
 
   Widget _buildCategoryItem(
-    String value,
-    String label,
-    double screenWidth,
-    int index,
-  ) {
-    return GestureDetector(
-      onTap: () => controller.changeCategory(index),
-      child: Obx(
-        () => Container(
-          width: screenWidth * 0.23,
-          padding: EdgeInsets.all(screenWidth * 0.02),
-          decoration: BoxDecoration(
-            color:
-                controller.selectedCategoryIndex.value == index
-                    ? Color(0xFFE6E0FA)
-                    : Colors.white,
-          ),
-          child: Column(
-            children: [
-              Text(
+  String value,
+  String label,
+  double screenWidth,
+  int index, {
+  double radius = 40, // control circle size
+}) {
+  double diameter = radius * 1.6;
+
+  return GestureDetector(
+    onTap: () => controller.changeCategory(index),
+    child: Obx(
+      () {
+        bool isSelected = controller.selectedCategoryIndex.value == index;
+        return Column(
+          children: [
+            Container(
+              width: diameter,
+              height: diameter,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isSelected ? const Color(0xFFE6E0FA) : Colors.white,
+                border: isSelected
+                    ? null
+                    : Border.all(color: Colors.grey.shade300, width: 1.5),
+              ),
+              alignment: Alignment.center,
+              child: Text(
                 value,
                 style: TextStyle(
-                  fontSize: screenWidth * 0.05,
+                  fontSize: radius * 0.5,
                   fontWeight: FontWeight.bold,
-                  color:
-                      controller.selectedCategoryIndex.value == index
-                          ? Colors.black
-                          : Colors.grey,
+                  color: isSelected ? Colors.black : Colors.grey,
                 ),
               ),
-              SizedBox(height: screenWidth * 0.01),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: screenWidth * 0.03,
-                  color:
-                      controller.selectedCategoryIndex.value == index
-                          ? Colors.black
-                          : Colors.grey,
-                ),
+            ),
+            SizedBox(height: screenWidth * 0.03),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: radius * 0.3,
+                color: isSelected ? Colors.black : Colors.grey,
               ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+            ),
+          ],
+        );
+      },
+    ),
+  );
+}
+
+
 
   Widget _buildListItemSection(double screenWidth, double screenHeight) {
-    return Obx(() {
-      final categoryIndex = controller.selectedCategoryIndex.value;
+  return Obx(() {
+    final categoryIndex = controller.selectedCategoryIndex.value;
 
-      // Add null check and handle empty state
-      if (controller.categoryData.value.isEmpty ||
-          categoryIndex >= controller.categoryData.value.length) {
-        return Center(
+    // Handle cases where data is empty or selected category has no entries
+    if (controller.categoryData.isEmpty ||
+        categoryIndex >= controller.categoryData.length ||
+        controller.categoryData[categoryIndex].isEmpty) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                'assets/empty.png', // replace with your image path
-                width: 150,
-                height: 150,
+                'assets/empty.png',
+                width: screenWidth,
+                height: screenHeight * 0.25,
                 fit: BoxFit.contain,
               ),
-              SizedBox(height: 16),
               Text(
-                'No data available',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                'Oops No Data Found...',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.045,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
+              SizedBox(height: screenHeight * 0.2),
             ],
           ),
-        );
-      }
-
-      final categoryItems = controller.categoryData.value[categoryIndex];
-
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ListView.separated(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: categoryItems.length,
-            separatorBuilder: (_, __) => SizedBox(height: screenHeight * 0),
-            itemBuilder:
-                (context, index) => _buildListItem(
-                  categoryItems[index],
-                  screenWidth,
-                  screenHeight,
-                ),
-          ),
-        ],
+        ),
       );
-    });
-  }
+    }
+
+    final categoryItems = controller.categoryData[categoryIndex];
+
+    return Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    ListView.separated(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemCount: categoryItems.length,
+      separatorBuilder: (_, __) => Divider(
+        color: Colors.grey.shade300,
+        thickness: 1.3,
+        height: 0, // No extra height, no gap between items
+      ),
+      itemBuilder: (context, index) => _buildListItem(
+        categoryItems[index],
+        screenWidth,
+        screenHeight,
+      ),
+    ),
+  ],
+);
+
+  });
+}
+
 
   Widget _buildListItem(
     Map<String, dynamic> item,
@@ -409,7 +438,7 @@ class _HomeContentState extends State<HomeContent> {
     return GestureDetector(
       onTap: () => Get.to(() => UnitDetailScreen(projectUid, widget.userUid)),
       child: Container(
-        padding: EdgeInsets.all(screenWidth * 0.02),
+        padding: EdgeInsets.all(screenWidth * 0.03),
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -425,8 +454,8 @@ class _HomeContentState extends State<HomeContent> {
             Column(
               children: [
                 Container(
-                  width: screenWidth * 0.1,
-                  height: screenWidth * 0.1,
+                  width: screenWidth * 0.065,
+                  height: screenWidth * 0.065,
                   decoration: BoxDecoration(
                     color: Colors.black,
                     borderRadius: BorderRadius.circular(screenWidth * 0.06),
@@ -436,17 +465,18 @@ class _HomeContentState extends State<HomeContent> {
                     unitNo,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: screenWidth * 0.035,
+                      fontSize: screenWidth * 0.03,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                SizedBox(height: screenHeight * 0.005),
+                SizedBox(height: screenHeight * 0.007),
                 Text(
-                  'Unit No',
+                  'UNIT NO',
                   style: TextStyle(
-                    fontSize: screenWidth * 0.035,
-                    color: Colors.grey[600],
+                    fontSize: screenWidth * 0.025,
+                    color: Colors.grey.shade800,
+                    fontWeight: FontWeight.w600
                   ),
                 ),
               ],
@@ -482,10 +512,8 @@ class _HomeContentState extends State<HomeContent> {
             // ),
             Text(
               '₹ $formattedAmount',
-              style: TextStyle(fontSize: screenWidth * 0.03),
+              style: TextStyle(fontSize: screenWidth * 0.035),
             ),
-
-            SizedBox(width: screenWidth * 0.05),
           ],
         ),
       ),
@@ -505,7 +533,7 @@ class _HomeContentState extends State<HomeContent> {
           Center(
             child: Image.asset(
               'assets/shubha.png',
-              width: screenWidth * 0.6,
+              width: screenWidth * 0.45,
               fit: BoxFit.contain,
             ),
           ),

@@ -183,7 +183,6 @@ String _formatIndianCurrency(int amount) {
                   height: widget.screenHeight * 0.04,
                   decoration: BoxDecoration(
                     color: const Color(0xFFD7C5F4),
-                    borderRadius: BorderRadius.circular(widget.screenHeight * 0.005),
                   ),
                   child: TextButton(
                     onPressed: () {},
