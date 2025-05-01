@@ -34,6 +34,7 @@ class _SearchScreenState extends State<SearchScreen> {
       children: [
         _buildSearchField(screenWidth), // Now closer to AppBar
         _buildCategoryFilters(screenWidth),
+        SizedBox(height: 15,),
         _buildContentArea(screenHeight),
       ],
     ),
@@ -44,25 +45,27 @@ PreferredSizeWidget _buildCustomAppBar(double screenWidth) {
   return AppBar(
     automaticallyImplyLeading: false,
     backgroundColor: Colors.white,
+    elevation: 0,
+    titleSpacing: 0, // Removes default left spacing
     title: Row(
       children: [
         IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Colors.black, size: 20),
           onPressed: () => Get.back(),
-        ),Text(
-              'Search',
-              style: TextStyle(
-                fontSize: screenWidth * 0.05,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-          
-        
+        ),
+        Text(
+          'Search',
+          style: TextStyle(
+            fontSize: screenWidth * 0.04,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
       ],
     ),
   );
 }
+
 
 Widget _buildSearchField(double screenWidth) {
   return Padding(
@@ -97,27 +100,27 @@ Widget _buildCategoryFilters(double screenWidth) {
       child: Row(
         children: controller.categories.map((category) {
           final isSelected = category == controller.selectedCategory.value;
-          return Padding(
-            padding: EdgeInsets.only(right: 10),
+          return Container(
+            margin: EdgeInsets.only(right: screenWidth * 0.04), // Adds spacing between buttons
             child: ElevatedButton(
               onPressed: () => controller.selectCategory(category),
               style: ElevatedButton.styleFrom(
-                backgroundColor: isSelected ? Color(0xFFE6E0FA) : Colors.white, // Light lavender for selected
+                backgroundColor: isSelected ? const Color(0xFFEDE9FE) : Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero, // Sharp corners
+                  borderRadius: BorderRadius.zero,
                 ),
-                side: BorderSide.none, // No border for selected
+                side: BorderSide.none,
                 padding: EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
+                  horizontal: screenWidth * 0.03,
+                  vertical: screenWidth * 0.02,
                 ),
               ),
               child: Text(
                 category,
                 style: TextStyle(
-                  color: Colors.black, // Always black text
+                  color: Colors.black,
                   fontSize: screenWidth * 0.035,
-                  fontWeight: FontWeight.bold, // Bold text
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -128,16 +131,11 @@ Widget _buildCategoryFilters(double screenWidth) {
   );
 }
 
+
 Widget _buildContentArea(double screenHeight) {
   return Expanded(
     child: Container(
-      color: Colors.black, // Black container
-      child: Center(
-        child: Text(
-          "Search Results",
-          style: TextStyle(fontSize: 18, color: Colors.white), // White text for visibility
-        ),
-      ),
+      color: Color(0xFFB1B1B5),
     ),
   );
 }
