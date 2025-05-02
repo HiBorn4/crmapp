@@ -14,7 +14,7 @@ class TaperedLinePainter extends CustomPainter {
 
     for (double i = 0; i < lineWidth; i++) {
       double thickness = 4 * (1 - (2 * (i / lineWidth - 0.5)).abs());
-      paint.strokeWidth = thickness.clamp(0, 1.5);
+      paint.strokeWidth = thickness.clamp(0, 3);
       canvas.drawPoints(
         PointMode.points,
         [Offset(startX + i, size.height / 2)],

@@ -51,7 +51,7 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.white,
       appBar: _buildAppBar(screenWidth),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(
@@ -112,25 +112,39 @@ _buildSection(
   }
 
   AppBar _buildAppBar(double screenWidth) {
-    return AppBar(
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Unit Overview',
-            style: TextStyle(
-              fontSize: Responsive.getFontSize(screenWidth, 20),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            'Shuba Ecostone - 131',
-            style: TextStyle(fontSize: Responsive.getFontSize(screenWidth, 14)),
-          ),
-        ],
+  return AppBar(
+    automaticallyImplyLeading: false,
+    leading: Padding(
+      padding: EdgeInsets.only(left: screenWidth * 0.015), // Reduced left padding
+      child: IconButton(
+        icon: Icon(Icons.arrow_back, color: Colors.black),
+        onPressed: () => Get.back(),
       ),
-    );
-  }
+    ),
+    titleSpacing: 0, // Reduces gap between back arrow and title
+    title: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Unit Overview',
+          style: TextStyle(
+            fontSize: Responsive.getFontSize(screenWidth, 20),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          'Shuba Ecostone - 131',
+          style: TextStyle(
+            fontSize: Responsive.getFontSize(screenWidth, 14),
+          ),
+        ),
+      ],
+    ),
+    backgroundColor: Colors.white,
+    elevation: 0,
+  );
+}
+
 
   Widget _buildUnitChart(double screenWidth) {
     RxInt selectedTab = 0.obs; // 0 = Stage Balance, 1 = Unit Cost

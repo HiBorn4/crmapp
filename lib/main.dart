@@ -27,7 +27,6 @@ void main() async {
   } catch (e) {
     print('Error initializing SharedPreferences: $e');
   }
-
   runApp(MyApp());
 }
 

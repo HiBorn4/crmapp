@@ -17,7 +17,7 @@ class PaymentScheduleScreen extends StatefulWidget {
 }
 
 class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
-   late UnitController _controller;
+  late UnitController _controller;
 
   @override
   void initState() {
@@ -31,6 +31,7 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
   void dispose() {
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -74,9 +75,7 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
           ),
           Text(
             'Shuba Ecostone - 131',
-            style: TextStyle(
-              fontSize: screenHeight * 0.016,
-            ),
+            style: TextStyle(fontSize: screenHeight * 0.016),
           ),
         ],
       ),
@@ -84,53 +83,58 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
   }
 
   Widget _buildTotalBalance(double screenWidth, double screenHeight) {
-  return Obx(() {
-    final totalAmount = _controller.totalAmount.value;
+    return Obx(() {
+      final totalAmount = _controller.totalAmount.value;
 
-    return Column(
-      children: [
-        Text(
-          'TOTAL BALANCE',
-          style: TextStyle(
-            fontSize: screenHeight * 0.018,
-            color: Colors.grey,
+      return Column(
+        children: [
+          Text(
+            'TOTAL BALANCE',
+            style: TextStyle(
+              fontSize: screenHeight * 0.018,
+              color: Colors.grey,
+            ),
           ),
-        ),
-        SizedBox(height: screenHeight * 0.01),
-        TweenAnimationBuilder<double>(
-          tween: Tween<double>(begin: 0, end: totalAmount),
-          duration: const Duration(seconds: 2),
-          builder: (context, value, _) {
-            return Text(
-              formatIndianCurrency(value),
-              style: TextStyle(
-                fontSize: screenHeight * 0.035,
-                fontWeight: FontWeight.bold,
-              ),
-            );
-          },
-        ),
-      ],
-    );
-  });
-}
-
-
-
-  Widget _buildPaymentList(double screenWidth, double screenHeight) {
-    return Obx(() => ListView.builder(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      itemCount: _controller.payments.length,
-      itemBuilder: (context, index) => _buildPaymentItem(
-        screenWidth,
-        screenHeight,
-        _controller.payments[index],
-      ),
-    ));
+          SizedBox(height: screenHeight * 0.01),
+          TweenAnimationBuilder<double>(
+            tween: Tween<double>(begin: 0, end: totalAmount),
+            duration: const Duration(seconds: 2),
+            builder: (context, value, _) {
+              return Text(
+                formatIndianCurrency(value),
+                style: TextStyle(
+                  fontSize: screenHeight * 0.035,
+                  fontWeight: FontWeight.bold,
+                ),
+              );
+            },
+          ),
+        ],
+      );
+    });
   }
 
-  Widget _buildPaymentItem(double screenWidth, double screenHeight, PaymentEntry payment) {
+  Widget _buildPaymentList(double screenWidth, double screenHeight) {
+    return Obx(
+      () => ListView.builder(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: _controller.payments.length,
+        itemBuilder:
+            (context, index) => _buildPaymentItem(
+              screenWidth,
+              screenHeight,
+              _controller.payments[index],
+            ),
+      ),
+    );
+  }
+
+  Widget _buildPaymentItem(
+    double screenWidth,
+    double screenHeight,
+    PaymentEntry payment,
+  ) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
       padding: EdgeInsets.all(screenHeight * 0.015),
@@ -211,9 +215,10 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
                     fontSize: screenHeight * 0.018,
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
-                    decoration: payment.status == 'RECEIVED'
-                        ? TextDecoration.lineThrough
-                        : TextDecoration.none,
+                    decoration:
+                        payment.status == 'RECEIVED'
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none,
                   ),
                   children: [
                     TextSpan(
@@ -307,39 +312,44 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
             ),
           ),
         ),
-        Obx(() => ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: _controller.quickActions.length,
-          itemBuilder: (context, index) => _buildQuickActionItem(
-            screenWidth,
-            screenHeight,
-            _controller.quickActions[index],
+        Obx(
+          () => ListView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: _controller.quickActions.length,
+            itemBuilder:
+                (context, index) => _buildQuickActionItem(
+                  screenWidth,
+                  screenHeight,
+                  _controller.quickActions[index],
+                ),
           ),
-        )),
+        ),
       ],
     );
   }
 
-  Widget _buildQuickActionItem(double screenWidth, double screenHeight, QuickActionModel action) {
+  Widget _buildQuickActionItem(
+    double screenWidth,
+    double screenHeight,
+    QuickActionModel action,
+  ) {
     return Container(
-      margin: EdgeInsets.all(screenWidth*0.01),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black),
-      ),
+      margin: EdgeInsets.all(screenWidth * 0.01),
+      decoration: BoxDecoration(border: Border.all(color: Colors.black)),
       child: ListTile(
-        title: Text(action.title,
-            style: TextStyle(
-              fontSize: screenHeight * 0.018,
-              fontWeight: FontWeight.bold,
-            )),
-        subtitle: Text(action.description,
-            style: TextStyle(
-              fontSize: screenHeight * 0.015,
-              color: Colors.grey,
-            )),
-        trailing: Icon(Icons.arrow_forward_ios, 
-            size: screenHeight * 0.02),
+        title: Text(
+          action.title,
+          style: TextStyle(
+            fontSize: screenHeight * 0.018,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        subtitle: Text(
+          action.description,
+          style: TextStyle(fontSize: screenHeight * 0.015, color: Colors.grey),
+        ),
+        trailing: Icon(Icons.arrow_forward_ios, size: screenHeight * 0.02),
         onTap: () => _handleQuickAction(action.title),
       ),
     );
@@ -349,4 +359,3 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
     // Implement navigation logic
   }
 }
-

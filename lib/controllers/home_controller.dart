@@ -63,9 +63,9 @@ class HomeController extends GetxController {
 
       Map<String, List<Map<String, dynamic>>> categorizedLeads = {
         'booked': [],
+        'registered': [],
         'agreement_pipeline': [],
         'agreement': [],
-        'registered': [],
         'possession': [],
         'construction': [],
       };
@@ -104,7 +104,7 @@ class HomeController extends GetxController {
     }
   }
 
-    Map<String, dynamic> _sanitizeData(Map<String, dynamic> data) {
+  Map<String, dynamic> _sanitizeData(Map<String, dynamic> data) {
     final sanitized = <String, dynamic>{};
 
     data.forEach((key, value) {
@@ -138,8 +138,8 @@ class HomeController extends GetxController {
 
   void updateSummaryData() {
     summaryData.value = [
-      {'value': '0', 'label': 'Total Tasks'},
       {'value': totalLeadsCount.value.toString(), 'label': 'Total Units'},
+      {'value': '0', 'label': 'Total Task'},
       {'value': '0', 'label': 'Completed'},
     ];
     update();

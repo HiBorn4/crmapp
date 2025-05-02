@@ -6,6 +6,7 @@ import 'package:crmapp/screens/unit_detail_screen.dart';
 import 'package:crmapp/screens/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../controllers/home_controller.dart';
 import '../utils/tapered_line_painter.dart';
 import '../widgets/summary_item.dart';
@@ -150,14 +151,12 @@ class _HomeContentState extends State<HomeContent> {
           ],
         ),
         bottom: PreferredSize(
-      preferredSize: Size.fromHeight(3), // Adjust height as needed
-      child: CustomPaint(
-        painter: TaperedLinePainter(),
-        child: SizedBox(
-          width: double.infinity,
+          preferredSize: Size.fromHeight(3), // Adjust height as needed
+          child: CustomPaint(
+            painter: TaperedLinePainter(),
+            child: SizedBox(width: double.infinity),
+          ),
         ),
-      ),
-    ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -176,18 +175,22 @@ class _HomeContentState extends State<HomeContent> {
                   children: [
                     SizedBox(height: screenHeight * 0.015),
                     _buildSummarySection(screenWidth, screenHeight, controller),
-                    SizedBox(height: screenHeight * 0.02),
+                    SizedBox(height: screenHeight * 0.025),
                     _buildCategorySection(screenHeight, screenWidth),
-                    SizedBox(height: screenHeight * 0.04),
-                    // Obx(
-                    // () =>
-                    _buildListItemSection(screenWidth, screenHeight),
-                    // ),
                   ],
                 ),
               ),
             ),
-            _buildFooterSection(screenWidth, screenHeight),
+            PreferredSize(
+              preferredSize: Size.fromHeight(10), // Adjust height as needed
+              child: CustomPaint(
+                painter: TaperedLinePainter(),
+                child: SizedBox(width: double.infinity),
+              ),
+            ),
+            _buildListItemSection(screenWidth, screenHeight),
+            SizedBox(height: screenHeight * 0.15),
+            _buildFooterSection(screenWidth),
           ],
         ),
       ),
@@ -218,7 +221,10 @@ class _HomeContentState extends State<HomeContent> {
       children: [
         Text(
           'UNIT SUMMARY',
-          style: TextStyle(fontSize: Responsive.getFontSize(screenWidth, 14), fontWeight: FontWeight.w500),
+          style: TextStyle(
+            fontSize: Responsive.getFontSize(screenWidth, 15),
+            fontWeight: FontWeight.w500,
+          ),
         ),
         SizedBox(height: screenHeight * 0.015),
 
@@ -230,11 +236,14 @@ class _HomeContentState extends State<HomeContent> {
                   var item = entry.value;
 
                   return Expanded(
-                    child: SummaryItem(
-                      value: item['value']!,
-                      label: item['label']!,
-                      screenWidth: screenWidth,
-                      isFirst: index == 0,
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        left: index == 0 ? 0 : 8, // small margin between cards
+                      ),
+                      child: SummaryItem(
+                        value: item['value']!,
+                        label: item['label']!,
+                      ),
                     ),
                   );
                 }).toList(),
@@ -251,7 +260,10 @@ class _HomeContentState extends State<HomeContent> {
         children: [
           Text(
             'CATEGORY',
-            style: TextStyle(fontSize: Responsive.getFontSize(screenWidth, 14)),
+            style: TextStyle(
+              fontSize: Responsive.getFontSize(screenWidth, 15),
+              fontWeight: FontWeight.w500,
+            ),
           ),
           SizedBox(height: screenHeight * 0.015),
           SingleChildScrollView(
@@ -285,33 +297,32 @@ class _HomeContentState extends State<HomeContent> {
       case 0:
         return 'Booked';
       case 1:
-        return 'Allotment';
+        return 'Registered';
       case 2:
-        return 'Agreement';
+        return 'Allotment';
       case 3:
-        return 'Construction';
+        return 'Agreement';
       case 4:
-        return 'Registration';
-      case 5:
         return 'Possession';
+      case 5:
+        return 'Registration';
       default:
         return 'Category';
     }
   }
 
   Widget _buildCategoryItem(
-  String value,
-  String label,
-  double screenWidth,
-  int index, {
-  double radius = 40, // control circle size
-}) {
-  double diameter = radius * 1.6;
+    String value,
+    String label,
+    double screenWidth,
+    int index, {
+    double radius = 40, // control circle size
+  }) {
+    double diameter = radius * 1.6;
 
-  return GestureDetector(
-    onTap: () => controller.changeCategory(index),
-    child: Obx(
-      () {
+    return GestureDetector(
+      onTap: () => controller.changeCategory(index),
+      child: Obx(() {
         bool isSelected = controller.selectedCategoryIndex.value == index;
         return Column(
           children: [
@@ -321,9 +332,10 @@ class _HomeContentState extends State<HomeContent> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: isSelected ? const Color(0xFFE6E0FA) : Colors.white,
-                border: isSelected
-                    ? null
-                    : Border.all(color: Colors.grey.shade300, width: 1.5),
+                border:
+                    isSelected
+                        ? null
+                        : Border.all(color: Colors.grey.shade300, width: 1.5),
               ),
               alignment: Alignment.center,
               child: Text(
@@ -345,75 +357,71 @@ class _HomeContentState extends State<HomeContent> {
             ),
           ],
         );
-      },
-    ),
-  );
-}
-
-
+      }),
+    );
+  }
 
   Widget _buildListItemSection(double screenWidth, double screenHeight) {
-  return Obx(() {
-    final categoryIndex = controller.selectedCategoryIndex.value;
+    return Obx(() {
+      final categoryIndex = controller.selectedCategoryIndex.value;
 
-    // Handle cases where data is empty or selected category has no entries
-    if (controller.categoryData.isEmpty ||
-        categoryIndex >= controller.categoryData.length ||
-        controller.categoryData[categoryIndex].isEmpty) {
-      return Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/empty.png',
-                width: screenWidth,
-                height: screenHeight * 0.25,
-                fit: BoxFit.contain,
-              ),
-              Text(
-                'Oops No Data Found...',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: screenWidth * 0.045,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w900,
+      // Handle cases where data is empty or selected category has no entries
+      if (controller.categoryData.isEmpty ||
+          categoryIndex >= controller.categoryData.length ||
+          controller.categoryData[categoryIndex].isEmpty) {
+        return Center(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/empty.png',
+                  width: screenWidth,
+                  height: screenHeight * 0.25,
+                  fit: BoxFit.contain,
                 ),
-              ),
-              SizedBox(height: screenHeight * 0.2),
-            ],
+                Text(
+                  'Oops No Data Found...',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.045,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                SizedBox(height: screenHeight * 0.2),
+              ],
+            ),
           ),
-        ),
+        );
+      }
+
+      final categoryItems = controller.categoryData[categoryIndex];
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ListView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: categoryItems.length,
+            itemBuilder:
+                (context, index) => Padding(
+                  padding: EdgeInsets.only(
+                    bottom: screenHeight * 0.01,
+                  ), // adjust spacing as needed
+                  child: _buildListItem(
+                    categoryItems[index],
+                    screenWidth,
+                    screenHeight,
+                  ),
+                ),
+          ),
+        ],
       );
-    }
-
-    final categoryItems = controller.categoryData[categoryIndex];
-
-    return Column(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
-    ListView.separated(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      itemCount: categoryItems.length,
-      separatorBuilder: (_, __) => Divider(
-        color: Colors.grey.shade300,
-        thickness: 1.3,
-        height: 0, // No extra height, no gap between items
-      ),
-      itemBuilder: (context, index) => _buildListItem(
-        categoryItems[index],
-        screenWidth,
-        screenHeight,
-      ),
-    ),
-  ],
-);
-
-  });
-}
-
+    });
+  }
 
   Widget _buildListItem(
     Map<String, dynamic> item,
@@ -438,7 +446,7 @@ class _HomeContentState extends State<HomeContent> {
     return GestureDetector(
       onTap: () => Get.to(() => UnitDetailScreen(projectUid, widget.userUid)),
       child: Container(
-        padding: EdgeInsets.all(screenWidth * 0.03),
+        padding: EdgeInsets.all(screenWidth * 0.035),
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -454,29 +462,33 @@ class _HomeContentState extends State<HomeContent> {
             Column(
               children: [
                 Container(
-                  width: screenWidth * 0.065,
-                  height: screenWidth * 0.065,
+                  width: screenWidth * 0.14,
+                  height: screenWidth * 0.14,
                   decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(screenWidth * 0.06),
+                    color: Color(0xFFEDE9FE),
+                    // borderRadius: BorderRadius.circular(8), // Use a fixed radius for squareness
                   ),
                   alignment: Alignment.center,
-                  child: Text(
-                    unitNo,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: screenWidth * 0.03,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                SizedBox(height: screenHeight * 0.007),
-                Text(
-                  'UNIT NO',
-                  style: TextStyle(
-                    fontSize: screenWidth * 0.025,
-                    color: Colors.grey.shade800,
-                    fontWeight: FontWeight.w600
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Unit No',
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.03,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        unitNo,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: screenWidth * 0.035,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -493,26 +505,58 @@ class _HomeContentState extends State<HomeContent> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: screenHeight * 0.005),
                   Text(
-                    contact,
+                    "Shuba Ecostone",
                     style: TextStyle(
-                      fontSize: screenWidth * 0.035,
+                      fontSize: screenWidth * 0.03,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  Text(
+                    "Last Activity: 180 Days",
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.03,
                       color: Colors.grey[600],
                     ),
                   ),
                 ],
               ),
             ),
-            // Text(
-            //   amount,
-            //   style: TextStyle(
-            //     fontSize: screenWidth * 0.04,
-            //   ),
-            // ),
-            Text(
-              '₹ $formattedAmount',
-              style: TextStyle(fontSize: screenWidth * 0.035),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                // Row of colored dots
+                Row(
+                  children: [
+                    _buildDot(Colors.yellow, screenWidth),
+                    SizedBox(width: screenWidth * 0.01),
+                    _buildDot(Colors.green, screenWidth),
+                    SizedBox(width: screenWidth * 0.01),
+                    _buildDot(Colors.red, screenWidth),
+                  ],
+                ),
+                SizedBox(height: screenWidth * 0.015),
+
+                // Due text
+                Text(
+                  'Due in 2 days',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: screenWidth * 0.03,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: screenWidth * 0.01),
+
+                // Amount
+                Text(
+                  '₹ $formattedAmount',
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.038,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -520,104 +564,160 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 
-  Widget _buildFooterSection(double screenWidth, double screenHeight) {
+  Widget _buildDot(Color color, double screenWidth) {
     return Container(
-      color: Colors.black,
+      width: screenWidth * 0.02,
+      height: screenWidth * 0.02,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    );
+  }
+
+  Widget _buildFooterSection(double screenWidth) {
+    double fontSize = Responsive.getFontSize(screenWidth, 16);
+    double iconSize = screenWidth * 0.075; // Icons scale with screen width
+    double titleSize = Responsive.getFontSize(screenWidth, 20);
+    double shubaFontSize = Responsive.getFontSize(screenWidth, 28);
+    double shubaHFontSize = Responsive.getFontSize(screenWidth, 36);
+
+    return Container(
+      color: Color(0xff191B1C),
       padding: EdgeInsets.symmetric(
-        vertical: screenHeight * 0.03,
-        horizontal: screenWidth * 0.05,
+        vertical: screenWidth * 0.05, // Dynamic vertical padding
+        horizontal: screenWidth * 0.08, // Adjusted for different screens
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // "Shuba" with Artistic Styled "H"
           Center(
             child: Image.asset(
-              'assets/shubha.png',
-              width: screenWidth * 0.45,
-              fit: BoxFit.contain,
+              'assets/shubha.png', // Replace with your actual image path
+              width:
+                  shubaFontSize *
+                  6, // Adjust size dynamically based on font size
+              fit: BoxFit.contain, // Ensures the image scales properly
             ),
           ),
-          SizedBox(height: screenHeight * 0.02),
+
+          SizedBox(height: screenWidth * 0.03),
           Text(
-            'Address',
-            style: TextStyle(
+            "address",
+            style: GoogleFonts.outfit(
               color: Colors.white,
-              fontSize: Responsive.getFontSize(screenWidth, 16),
-              fontWeight: FontWeight.bold,
+              fontSize: titleSize,
+              fontWeight: FontWeight.w600,
             ),
             textAlign: TextAlign.center,
           ),
+          SizedBox(height: 6),
+
+          // Address
           Text(
-            '1234, Random Street, City Name, Country',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: Responsive.getFontSize(screenWidth, 14),
+            "#1,HSR Sector 1, Bangalore, Karnataka-560049",
+            style: GoogleFonts.outfit(
+              color: Color(0xff737576),
+              fontSize: fontSize,
+              fontWeight: FontWeight.w600,
             ),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: screenHeight * 0.01),
+
+          SizedBox(height: screenWidth * 0.03),
+
+          // "View in Map" Button
           GestureDetector(
-            onTap: () => _launchMap(),
+            onTap: () {
+              // Handle map opening
+            },
             child: Text(
-              'View in Map',
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: Responsive.getFontSize(screenWidth, 14),
+              "View in Map",
+              style: GoogleFonts.outfit(
+                color: Color(0xff737576),
+                fontSize: fontSize,
+                fontWeight: FontWeight.w400,
                 decoration: TextDecoration.underline,
               ),
             ),
           ),
-          SizedBox(height: screenHeight * 0.02),
+
+          SizedBox(height: screenWidth * 0.06),
+
+          // Contact Info
           Text(
-            'Contact Us',
-            style: TextStyle(
+            "Contact Us",
+            style: GoogleFonts.outfit(
               color: Colors.white,
-              fontSize: Responsive.getFontSize(screenWidth, 18),
-              fontWeight: FontWeight.bold,
+              fontSize: titleSize,
+              fontWeight: FontWeight.w600,
             ),
           ),
-          SizedBox(height: screenHeight * 0.01),
+
+          SizedBox(height: screenWidth * 0.015),
+
           Text(
-            '+91 1234567890 || www.shubaexample.com',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: Responsive.getFontSize(screenWidth, 14),
+            "+91 1234567890 || www.shubaexample.com",
+            style: GoogleFonts.outfit(
+              color: Color(0xff737576),
+              fontSize: fontSize,
+              fontWeight: FontWeight.w400,
             ),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: screenHeight * 0.02),
+
+          SizedBox(height: screenWidth * 0.07),
+
           Text(
-            'Report',
-            style: TextStyle(
+            "our website",
+            style: GoogleFonts.outfit(
               color: Colors.white,
-              fontSize: Responsive.getFontSize(screenWidth, 18),
-              fontWeight: FontWeight.bold,
+              fontSize: titleSize,
+              fontWeight: FontWeight.w600,
             ),
           ),
-          SizedBox(height: screenHeight * 0.02),
+
+          SizedBox(height: screenWidth * 0.07),
+
+          // Report
+          Text(
+            "Report",
+            style: GoogleFonts.outfit(
+              color: Colors.white,
+              fontSize: titleSize,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          SizedBox(height: screenWidth * 0.07),
+
+          Center(
+            child: Text(
+              "connect with us",
+              style: GoogleFonts.outfit(
+                color: Color(0xff737576),
+                fontSize: titleSize,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+
+          SizedBox(height: screenWidth * 0.05),
+
+          // Social Media Icons
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildSocialIcon(
-                'assets/whatsapp.png',
-                screenWidth * 0.06,
-                () => _launchWhatsApp(),
-              ),
-              _buildSocialIcon(
-                'assets/insta.png',
-                screenWidth * 0.06,
-                () => _launchInstagram(),
-              ),
-              _buildSocialIcon(
-                'assets/x.png',
-                screenWidth * 0.06,
-                () => _launchTwitter(),
-              ),
-              _buildSocialIcon(
-                'assets/fb.png',
-                screenWidth * 0.06,
-                () => _launchFacebook(),
-              ),
+              _buildSocialIcon('assets/whatsapp.png', iconSize, () {
+                // Handle WhatsApp click
+              }),
+
+              _buildSocialIcon('assets/insta.png', iconSize, () {
+                // Handle Instagram click
+              }),
+              _buildSocialIcon('assets/x.png', iconSize, () {
+                // Handle X (Twitter) click
+              }),
+              _buildSocialIcon('assets/fb.png', iconSize, () {
+                // Handle Facebook click
+              }),
             ],
           ),
         ],
