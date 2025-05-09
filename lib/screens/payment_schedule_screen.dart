@@ -140,12 +140,11 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
       padding: EdgeInsets.all(screenHeight * 0.015),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(screenHeight * 0.01),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: screenHeight * 0.002,
-            blurRadius: screenHeight * 0.01,
+            // color: Colors.grey.withOpacity(0.2),
+            // spreadRadius: screenHeight * 0.002,
+            // blurRadius: screenHeight * 0.01,
           ),
         ],
       ),
@@ -257,16 +256,16 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
                   height: screenHeight * 0.04,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.zero),
-                    color: Color(0xFFD7C5F4),
+                    color: Color(0xFFF5E6E6),
                   ),
                   child: TextButton(
                     onPressed: () {},
                     child: Text(
-                      'Pay Now',
+                      'Delayed',
                       style: TextStyle(
                         fontSize: screenHeight * 0.016,
-                        color: AppColors.primaryColor,
-                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF960000),
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),

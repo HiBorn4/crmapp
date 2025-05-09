@@ -4,6 +4,7 @@ import 'package:crmapp/screens/overview_screen.dart';
 import 'package:crmapp/screens/profile_screen.dart';
 import 'package:crmapp/screens/unit_detail_screen.dart';
 import 'package:crmapp/screens/search_screen.dart';
+import 'package:crmapp/widgets/footer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -122,14 +123,20 @@ class _HomeContentState extends State<HomeContent> {
         leading: Row(
           children: [
             SizedBox(width: screenWidth * 0.03),
-            ClipOval(
-              child: Image.asset(
-                'assets/home_profile.png',
-                width: screenWidth * 0.11,
-                height: screenWidth * 0.11,
-                fit: BoxFit.cover,
-              ),
-            ),
+            GestureDetector(
+  onTap: () {
+    Get.to(() => ProfileScreen(uid: widget.userUid));
+  },
+  child: ClipOval(
+    child: Image.asset(
+      'assets/home_profile.png',
+      width: screenWidth * 0.11,
+      height: screenWidth * 0.11,
+      fit: BoxFit.cover,
+    ),
+  ),
+)
+
           ],
         ),
         title: Column(
@@ -190,7 +197,7 @@ class _HomeContentState extends State<HomeContent> {
             ),
             _buildListItemSection(screenWidth, screenHeight),
             SizedBox(height: screenHeight * 0.15),
-            _buildFooterSection(screenWidth),
+            Footer(screenWidth),
           ],
         ),
       ),
@@ -572,191 +579,5 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 
-  Widget _buildFooterSection(double screenWidth) {
-    double fontSize = Responsive.getFontSize(screenWidth, 16);
-    double iconSize = screenWidth * 0.075; // Icons scale with screen width
-    double titleSize = Responsive.getFontSize(screenWidth, 20);
-    double shubaFontSize = Responsive.getFontSize(screenWidth, 28);
-    double shubaHFontSize = Responsive.getFontSize(screenWidth, 36);
-
-    return Container(
-      color: Color(0xff191B1C),
-      padding: EdgeInsets.symmetric(
-        vertical: screenWidth * 0.05, // Dynamic vertical padding
-        horizontal: screenWidth * 0.08, // Adjusted for different screens
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // "Shuba" with Artistic Styled "H"
-          Center(
-            child: Image.asset(
-              'assets/shubha.png', // Replace with your actual image path
-              width:
-                  shubaFontSize *
-                  6, // Adjust size dynamically based on font size
-              fit: BoxFit.contain, // Ensures the image scales properly
-            ),
-          ),
-
-          SizedBox(height: screenWidth * 0.03),
-          Text(
-            "address",
-            style: GoogleFonts.outfit(
-              color: Colors.white,
-              fontSize: titleSize,
-              fontWeight: FontWeight.w600,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 6),
-
-          // Address
-          Text(
-            "#1,HSR Sector 1, Bangalore, Karnataka-560049",
-            style: GoogleFonts.outfit(
-              color: Color(0xff737576),
-              fontSize: fontSize,
-              fontWeight: FontWeight.w600,
-            ),
-            textAlign: TextAlign.center,
-          ),
-
-          SizedBox(height: screenWidth * 0.03),
-
-          // "View in Map" Button
-          GestureDetector(
-            onTap: () {
-              // Handle map opening
-            },
-            child: Text(
-              "View in Map",
-              style: GoogleFonts.outfit(
-                color: Color(0xff737576),
-                fontSize: fontSize,
-                fontWeight: FontWeight.w400,
-                decoration: TextDecoration.underline,
-              ),
-            ),
-          ),
-
-          SizedBox(height: screenWidth * 0.06),
-
-          // Contact Info
-          Text(
-            "Contact Us",
-            style: GoogleFonts.outfit(
-              color: Colors.white,
-              fontSize: titleSize,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-
-          SizedBox(height: screenWidth * 0.015),
-
-          Text(
-            "+91 1234567890 || www.shubaexample.com",
-            style: GoogleFonts.outfit(
-              color: Color(0xff737576),
-              fontSize: fontSize,
-              fontWeight: FontWeight.w400,
-            ),
-            textAlign: TextAlign.center,
-          ),
-
-          SizedBox(height: screenWidth * 0.07),
-
-          Text(
-            "our website",
-            style: GoogleFonts.outfit(
-              color: Colors.white,
-              fontSize: titleSize,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-
-          SizedBox(height: screenWidth * 0.07),
-
-          // Report
-          Text(
-            "Report",
-            style: GoogleFonts.outfit(
-              color: Colors.white,
-              fontSize: titleSize,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          SizedBox(height: screenWidth * 0.07),
-
-          Center(
-            child: Text(
-              "connect with us",
-              style: GoogleFonts.outfit(
-                color: Color(0xff737576),
-                fontSize: titleSize,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-
-          SizedBox(height: screenWidth * 0.05),
-
-          // Social Media Icons
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildSocialIcon('assets/whatsapp.png', iconSize, () {
-                // Handle WhatsApp click
-              }),
-
-              _buildSocialIcon('assets/insta.png', iconSize, () {
-                // Handle Instagram click
-              }),
-              _buildSocialIcon('assets/x.png', iconSize, () {
-                // Handle X (Twitter) click
-              }),
-              _buildSocialIcon('assets/fb.png', iconSize, () {
-                // Handle Facebook click
-              }),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSocialIcon(String assetPath, double size, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: size * 0.2),
-        child: Image.asset(
-          assetPath,
-          width: size,
-          height: size,
-          fit: BoxFit.contain,
-        ),
-      ),
-    );
-  }
-
-  void _launchMap() {
-    // Implement map launch functionality
-  }
-
-  void _launchWhatsApp() {
-    // Implement WhatsApp launch functionality
-  }
-
-  void _launchInstagram() {
-    // Implement Instagram launch functionality
-  }
-
-  void _launchTwitter() {
-    // Implement Twitter launch functionality
-  }
-
-  void _launchFacebook() {
-    // Implement Facebook launch functionality
-  }
+  
 }

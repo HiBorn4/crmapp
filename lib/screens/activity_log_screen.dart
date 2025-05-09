@@ -5,9 +5,22 @@ import '../controllers/activity_log_controller.dart';
 import '../models/activity_entry_model.dart';
 import '../models/quick_action_model.dart';
 import '../utils/app_colors.dart';
+import '../utils/tapered_line_painter.dart';
+import 'cost_sheet_screen.dart';
+import 'modification_screen.dart';
+import 'payment_schedule_screen.dart';
 
 
-class ActivityLogScreen extends StatelessWidget {
+class ActivityLogScreen extends StatefulWidget {
+  final String projectUid;
+  final String userUid;
+
+  ActivityLogScreen(this.projectUid, this.userUid);
+  @override
+  State<ActivityLogScreen> createState() => _ActivityLogScreenState();
+}
+
+class _ActivityLogScreenState extends State<ActivityLogScreen> {
   final ActivityLogController _controller = Get.put(ActivityLogController());
 
   @override
@@ -16,6 +29,7 @@ class ActivityLogScreen extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: _buildAppBar(screenWidth, screenHeight),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(screenWidth * 0.04),
@@ -32,6 +46,7 @@ class ActivityLogScreen extends StatelessWidget {
 
   AppBar _buildAppBar(double screenWidth, double screenHeight) {
     return AppBar(
+      backgroundColor: Colors.white,
       leading: IconButton(
         icon: Icon(Icons.arrow_back, size: screenHeight * 0.025),
         onPressed: () => Get.back(),
@@ -46,14 +61,20 @@ class ActivityLogScreen extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          Text(
-            'Shuba Ecostone - 131',
-            style: TextStyle(
-              fontSize: screenHeight * 0.016,
-            ),
-          ),
+          Obx(() => Text(
+  _controller.projectName.value,
+  style: TextStyle(fontSize: screenHeight * 0.016),
+))
+
         ],
       ),
+      bottom: PreferredSize(
+          preferredSize: Size.fromHeight(1), // Adjust height as needed
+          child: CustomPaint(
+            painter: TaperedLinePainter(),
+            child: SizedBox(width: double.infinity),
+          ),
+        ),
     );
   }
 
@@ -73,18 +94,18 @@ class ActivityLogScreen extends StatelessWidget {
 
   Widget _buildActivityItem(double screenWidth, double screenHeight, ActivityEntry activity, bool isLast) {
   return Container(
-    margin: EdgeInsets.only(bottom: screenHeight * 0.02),
+    margin: EdgeInsets.only(bottom: screenHeight * 0.003),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildTimeline(screenHeight, isLast),
-        SizedBox(width: screenWidth * 0.04),
+        Container(width: screenWidth*0.06, child: _buildTimeline(screenHeight, isLast)),
+        SizedBox(width: screenWidth * 0.01),
         Expanded(
           child: Container(
             decoration: BoxDecoration(
               color: Colors.white,
             ),
-            padding: EdgeInsets.all(screenHeight * 0.015),
+            padding: EdgeInsets.all(screenHeight * 0.01),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -105,32 +126,34 @@ class ActivityLogScreen extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: _getStatusColor(activity.status).withOpacity(0.2),
-                        border: Border.all(color: _getStatusColor(activity.status)),
+                        // border: Border.all(color: _getStatusColor(activity.status)),
                       ),
                       child: Text(
                         activity.status,
                         style: TextStyle(
                           fontSize: screenHeight * 0.014,
-                          fontWeight: FontWeight.w900,
+                          fontWeight: FontWeight.w700,
                           color: _getStatusColor(activity.status),
                         ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: screenHeight * 0.008),
+                SizedBox(height: screenHeight * 0.005),
                 Text(
                   'By: ${activity.author}',
                   style: TextStyle(
                     fontSize: screenHeight * 0.015,
-                    color: Colors.grey,
+                    color: Colors.grey.shade700,
+                    fontWeight: FontWeight.w600
                   ),
                 ),
                 Text(
-                  'On: ${activity.date}',
+                  '${activity.date}',
                   style: TextStyle(
                     fontSize: screenHeight * 0.015,
-                    color: Colors.grey,
+                    color: Colors.grey.shade700,
+                    fontWeight: FontWeight.w600
                   ),
                 ),
               ],
@@ -142,28 +165,33 @@ class ActivityLogScreen extends StatelessWidget {
   );
 }
 
-
   Widget _buildTimeline(double screenHeight, bool isLast) {
+  // Customizable parameters
+  final double dotSize = screenHeight * 0.015;
+  final double lineHeight = screenHeight * 0.1; // Directly controls gap between dots
+  final double verticalSpacing = 0; // Additional spacing between dot and line
+
   return Column(
+    mainAxisSize: MainAxisSize.min,
     children: [
       Container(
-        width: screenHeight * 0.015,
-        height: screenHeight * 0.015,
+        width: dotSize,
+        height: dotSize,
         decoration: BoxDecoration(
-          color: AppColors.primaryColor,
+          color: Colors.black,
           shape: BoxShape.circle,
         ),
       ),
       if (!isLast)
         Container(
+          margin: EdgeInsets.only(top: verticalSpacing),
           width: 2,
-          height: screenHeight * 0.1, // Reduced height slightly
-          color: AppColors.primaryColor,
+          height: lineHeight,
+          color: Colors.black,
         ),
     ],
   );
 }
-
 
   Color _getStatusColor(String status) {
     switch (status.toUpperCase()) {
@@ -187,8 +215,8 @@ class ActivityLogScreen extends StatelessWidget {
           child: Text(
             'QUICK ACTIONS',
             style: TextStyle(
-              fontSize: screenHeight * 0.02,
-              fontWeight: FontWeight.bold,
+              fontSize: screenHeight * 0.017,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
@@ -231,8 +259,19 @@ class ActivityLogScreen extends StatelessWidget {
   }
 
   void _handleQuickAction(String action) {
-    // Implement navigation logic
+  switch (action) {
+    case 'Cost Sheet':
+      Get.to(() => CostSheetScreen(widget.projectUid, widget.userUid));
+      break;
+    case 'Request Modification':
+      Get.to(() => ModificationScreen());
+      break;
+    case 'Payment Schedule':
+      Get.to(() => PaymentScheduleScreen(widget.projectUid, widget.userUid));
+      break;
+    default:
+      Get.snackbar('Unknown Action', 'No screen found for "$action"');
   }
-
+}
 }
 

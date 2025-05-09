@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_print, invalid_use_of_protected_member
 
-import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 
@@ -94,6 +93,7 @@ class HomeController extends GetxController {
       // Update counts and UI
       totalLeadsCount.value = categorizedLeads.values.fold(
         0,
+        // ignore: avoid_types_as_parameter_names
         (sum, list) => sum + list.length,
       );
       updateSummaryData();

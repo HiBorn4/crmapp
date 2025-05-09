@@ -1,3 +1,4 @@
+import 'package:crmapp/screens/activity_log_screen.dart';
 import 'package:crmapp/screens/cost_sheet_screen.dart';
 import 'package:crmapp/screens/modification_screen.dart';
 import 'package:flutter/material.dart';
@@ -154,23 +155,16 @@ _buildSection(
       () => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Heading
-          Text(
-            'UNIT SUMMARY',
-            style: TextStyle(
-              fontSize: Responsive.getFontSize(screenWidth, 14),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: screenWidth * 0.03),
-
           // Center-Aligned Tab Switcher
           Row(
-              // mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 _buildTab('Stage Balance', 0, selectedTab, screenWidth),
+                SizedBox(width: 10),
                 _buildTab('Unit Cost', 1, selectedTab, screenWidth),
+                SizedBox(width: 10),
+                _buildTab('Finance Balance', 2, selectedTab, screenWidth),
               ],
             ),
           
@@ -222,11 +216,11 @@ _buildSection(
                     isSelected
                         ? Responsive.getFontSize(
                           screenWidth,
-                          16,
+                          18,
                         ) // Larger for selected
                         : Responsive.getFontSize(
                           screenWidth,
-                          14,
+                          16,
                         ), // Smaller for unselected
                 fontWeight:
                     isSelected
@@ -525,9 +519,7 @@ String formatIndianCurrency(double amount) {
               screenHeight,
               Icons.list,
               "Activity",
-              () {
-                Get.toNamed('/activity-log');
-              },
+              () => Get.to(() => ActivityLogScreen(widget.projectUid, widget.userUid)),
             ),
             _buildCategoryItem(
               screenWidth,

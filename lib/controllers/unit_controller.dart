@@ -1,17 +1,13 @@
 // ignore_for_file: invalid_use_of_protected_member, avoid_print
 
-import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../models/cost_item_model.dart';
-import '../models/document_model.dart';
 import '../models/payment_entry_model.dart';
 import '../models/quick_action_model.dart';
-import '../models/transaction_model.dart';
-import '../models/unit_model.dart';
 
 class UnitController extends GetxController {
   final String userUid;
@@ -399,12 +395,16 @@ void _parseCostItems() {
 
 final List<QuickActionModel> quickActions = [
     QuickActionModel(
-      title: 'Payment Schedule',
-      description: 'View payment timeline',
+      title: 'Cost Sheet',
+      description: 'Get a clear breakdown of expenses',
     ),
     QuickActionModel(
-      title: 'Make a Payment',
-      description: 'Initiate new payment',
+      title: 'Request Modifications',
+      description: 'Customize your home to fit your needs',
+    ),
+    QuickActionModel(
+      title: 'Activity Log',
+      description: 'Track all your actions in one place and stay updated',
     ),
   ].obs;
 

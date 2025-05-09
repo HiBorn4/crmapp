@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crmapp/screens/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -13,10 +14,14 @@ class ProfileController extends GetxController {
 
   // Profile Data
   final RxList<Map<String, String>> accountOptions = <Map<String, String>>[
-    {'title': 'Change Password', 'desc': 'Update your account password'},
-    {'title': 'Refer', 'desc': 'Invite friends and earn rewards'},
-    {'title': 'Report', 'desc': 'Submit issues or feedback'},
-    {'title': 'Logout', 'desc': 'Sign out from your account'},
+    {'title': 'Notification', 'desc': 'Stay informed your way'},
+    {'title': 'Logout', 'desc': ''},
+  ].obs;
+
+  // Notification Data
+  final RxList<Map<String, String>> notificationOptions = <Map<String, String>>[
+    {'title': 'Payment due', 'desc': 'Never miss a payment'},
+    {'title': 'Offers and Discounts', 'desc': 'Save more with special offers and discounts'},
   ].obs;
 
   final RxList<SocialMedia> socialMediaLinks = <SocialMedia>[
@@ -58,13 +63,11 @@ class ProfileController extends GetxController {
           'address': data['address'] ?? 'No Address',
         };
 
-        print("User Data: Name - $userName, Role - $userRole");
       } else {
         errorMessage.value = 'User data not found.';
       }
     } catch (e) {
       errorMessage.value = 'Error fetching user profile: $e';
-      print(errorMessage.value);
     } finally {
       isLoading(false);
     }
@@ -73,17 +76,11 @@ class ProfileController extends GetxController {
   /// Handle account options
   void handleAccountOption(String option) {
     switch (option) {
-      case 'Change Password':
-        Get.toNamed('/change-password');
+      case 'Notification':
+        Get.to(NotificationScreen());
         break;
       case 'Logout':
         _confirmLogout();
-        break;
-      case 'Report':
-        _handleReport();
-        break;
-      case 'Refer':
-        _handleRefer();
         break;
     }
   }
@@ -103,27 +100,37 @@ class ProfileController extends GetxController {
     );
   }
 
-  void _handleReport() {
-    // Implement report functionality
-  }
+  final RxMap<String, bool> accountOptionStates = {
+  'Notification': true, // default state, can be fetched from backend
+  'Logout': false,
+}.obs;
 
-  void _handleRefer() {
-    // Implement refer functionality
-  }
+void toggleAccountOption(String title, bool value) {
+  accountOptionStates[title] = value;
+
+  // TODO: Save to backend if needed
+}
+
+
+
 
   /// Open Google Maps
   Future<void> openMap() async {
     final String address = userData['address'] ?? 'No Address';
     final url = 'https://www.google.com/maps/search/?api=1&query=$address';
 
+    // ignore: deprecated_member_use
     if (await canLaunch(url)) {
+      // ignore: deprecated_member_use
       await launch(url);
     }
   }
 
   /// Launch Social Media
   Future<void> launchSocialMedia(String url) async {
+    // ignore: deprecated_member_use
     if (await canLaunch(url)) {
+      // ignore: deprecated_member_use
       await launch(url);
     }
   }

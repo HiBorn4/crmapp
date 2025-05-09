@@ -3,9 +3,7 @@ import 'package:crmapp/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/about_screen.dart';
-import 'screens/activity_log_screen.dart';
 import 'screens/change_password_screen.dart';
 import 'screens/document_screen.dart';
 import 'screens/login_screen.dart';
@@ -51,7 +49,6 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/', page: () => SignupScreen()),
         GetPage(name: '/login', page: () => LoginScreen()),
         GetPage(name: '/search', page: () => SearchScreen()),
-        GetPage(name: '/activity-log', page: () => ActivityLogScreen()),
         GetPage(name: '/modification', page: () => ModificationScreen()),
         GetPage(name: '/about', page: () => AboutScreen()),
         GetPage(name: '/change-password', page: () => PasswordChangeScreen()),

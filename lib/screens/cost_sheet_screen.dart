@@ -7,6 +7,7 @@ import '../models/payment_entry_model.dart';
 import '../models/quick_action_model.dart';
 import '../utils/amount_formatting.dart';
 import '../utils/app_colors.dart';
+import '../utils/download_cost_sheet.dart';
 import '../utils/responsive.dart';
 import '../widgets/payment_schedule.dart';
 
@@ -50,35 +51,36 @@ class _CostSheetScreenState extends State<CostSheetScreen> {
         child: Column(
           children: [
             _buildTotalUnitCost(screenWidth, screenHeight),
+            SizedBox(height: screenHeight*0.03,),
             _buildSection(
-  'Additional Charges',
+  'Cost Sheet',
   _controller.additionalCharges,
   screenWidth,
   screenHeight,
   _controller.tA.value,  // Access the value using .value
 ),
 _buildSection(
-  'Construction Charges',
+  'Cost Sheet',
   _controller.constructionCharges,
   screenWidth,
   screenHeight,
   _controller.tB.value,  // Access the value using .value
 ),
 _buildSection(
-  'Construction Additional Charges',
+  'Cost Sheet',
   _controller.constructionAdditionalCharges,
   screenWidth,
   screenHeight,
   _controller.tC.value,  // Access the value using .value
 ),
 _buildSection(
-  'Possession Charges',
+  'Cost Sheet',
   _controller.possessionCharges,
   screenWidth,
   screenHeight,
   _controller.tD.value,  // Access the value using .value
 ),
-            _buildPaymentList(screenWidth, screenHeight),
+            download(screenWidth, screenHeight),
             _buildQuickActionsSection(screenWidth, screenHeight),
           ],
         ),
@@ -117,13 +119,14 @@ _buildSection(
   return Column(
     children: [
       Text(
-        'TOTAL BALANCE',
+        'TOTAL UNIT COST',
         style: TextStyle(
-          fontSize: screenHeight * 0.018,
-          color: Colors.grey,
+          fontSize: screenHeight * 0.01,
+          color: Colors.grey.shade800,
+          fontWeight: FontWeight.w800
         ),
       ),
-      SizedBox(height: screenHeight * 0.01),
+      // SizedBox(height: screenHeight * 0.01),
 
       // 👇 Animated amount transition
       Obx(() => TweenAnimationBuilder<double>(
@@ -151,23 +154,46 @@ _buildSection(
   double screenHeight,
   double total,
 ) {
+  final violetColor = Color(0xFFEDE9FE); // Light violet background
+
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Padding(
-        padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
-        child: Text(
-          title,
-          style: TextStyle(
-            fontSize: screenHeight * 0.016,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
+      Container(
+        color: violetColor,
+        padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.04,
+          vertical: screenHeight * 0.012,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: screenHeight * 0.016,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            Text(
+              'Price',
+              style: TextStyle(
+                fontSize: screenHeight * 0.016,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          ],
         ),
       ),
       Container(
+        height: 2,
+        color: Color(0xFFC7BBFC),
+      ),
+      Container(
         color: Colors.white,
-        padding: EdgeInsets.symmetric(horizontal: screenHeight * 0.02),
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
         child: Column(
           children: [
             ...items.map(
@@ -178,9 +204,11 @@ _buildSection(
           ],
         ),
       ),
+            SizedBox(height: screenHeight*0.02,)
     ],
   );
 }
+
 
 Widget _buildCostItem(CostItem item, double screenWidth, double screenHeight) {
   return Padding(
@@ -194,7 +222,7 @@ Widget _buildCostItem(CostItem item, double screenWidth, double screenHeight) {
             Text(
               item.description,
               style: TextStyle(
-                fontSize: screenHeight * 0.018,
+                fontSize: screenHeight * 0.015,
                 fontWeight: FontWeight.w500,
                 color: Colors.black,
               ),
@@ -212,7 +240,7 @@ Widget _buildCostItem(CostItem item, double screenWidth, double screenHeight) {
         Text(
           item.amount,
           style: TextStyle(
-            fontSize: screenHeight * 0.018,
+            fontSize: screenHeight * 0.016,
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
@@ -235,7 +263,7 @@ Widget _buildDashedDivider() {
           children: List.generate(dashCount, (index) => Container(
             width: dashWidth,
             height: 1,
-            color: Colors.black,
+            color: Colors.grey.shade400,
           )),
         );
       },
@@ -249,21 +277,21 @@ Widget _buildDashedDivider() {
   double total,
 ) {
   return Padding(
-    padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
+    padding: EdgeInsets.symmetric(vertical: screenHeight * 0.008),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           'Total',
           style: TextStyle(
-            fontSize: screenHeight * 0.018,
+            fontSize: screenHeight * 0.015,
             fontWeight: FontWeight.bold,
           ),
         ),
         Text(
           formatIndianCurrency(total),
           style: TextStyle(
-            fontSize: screenHeight * 0.018,
+            fontSize: screenHeight * 0.016,
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
@@ -273,239 +301,42 @@ Widget _buildDashedDivider() {
   );
 }
 
-  // Widget _buildPaymentList(double screenWidth, double screenHeight) {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       Padding(
-  //         padding: EdgeInsets.only(bottom: screenHeight * 0.01),
-  //         child: Text(
-  //           'Payment Schedule',
-  //           style: TextStyle(
-  //             fontSize: screenHeight * 0.016,
-  //             fontWeight: FontWeight.bold,
-  //             color: Colors.black,
-  //           ),
-  //         ),
-  //       ),
-  //       ListView.builder(
-  //         shrinkWrap: true,
-  //         physics: NeverScrollableScrollPhysics(),
-  //         itemCount: _controller.payments.length,
-  //         itemBuilder: (context, index) => _buildPaymentItem(
-  //           screenWidth,
-  //           screenHeight,
-  //           _controller.payments[index],
-  //         ),
-  //       ),
-  //       Align(
-  //         alignment: Alignment.bottomRight,
-  //         child: Padding(
-  //           padding: EdgeInsets.only(top: screenHeight * 0.01, right: screenWidth * 0.05),
-  //           child: Text(
-  //             'View All',
-  //             style: TextStyle(
-  //               fontSize: screenHeight * 0.018,
-  //               color: Colors.black,
-  //               decoration: TextDecoration.underline,
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
-  Widget _buildPaymentList(double screenWidth, double screenHeight) {
-    return Obx(
-      () => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'PAYMENT SCHEDULE',
-            style: TextStyle(
-              fontSize: Responsive.getFontSize(screenWidth, 14),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: screenWidth * 0.03),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: _controller.payments.length,
-            itemBuilder:
-                (context, index) => PaymentScheduleWidget(
-                  screenWidth: screenWidth,
-                  screenHeight: screenHeight,
-                  payment: _controller.payments[index],
-                ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPaymentItem(double screenWidth, double screenHeight, PaymentEntry payment) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
-      padding: EdgeInsets.all(screenHeight * 0.015),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(screenHeight * 0.01),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: screenHeight * 0.002,
-            blurRadius: screenHeight * 0.01,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: screenHeight * 0.03,
-                    height: screenHeight * 0.03,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.black,
-                    ),
-                    child: Center(
-                      child: Text(
-                        payment.number,
-                        style: TextStyle(
-                          fontSize: screenHeight * 0.015,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: screenWidth * 0.04),
-                  Text(
-                    payment.date,
-                    style: TextStyle(
-                      fontSize: screenHeight * 0.016,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              Text(
-                payment.status,
-                style: TextStyle(
-                  fontSize: screenHeight * 0.016,
-                  color: payment.statusColor,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: screenHeight * 0.01),
-          Text(
-            payment.description,
-            style: TextStyle(
-              fontSize: screenHeight * 0.018,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: screenHeight * 0.008),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              RichText(
-                text: TextSpan(
-                  text: payment.amount,
+Widget download(double screenWidth, double screenHeight) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Container(
+        margin: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        padding: EdgeInsets.symmetric(vertical: screenHeight * 0.015),
+        child: Center(
+          child: InkWell(
+            onTap: _downloadCostSheet,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(width: screenWidth * 0.02),
+                Text(
+                  'Download',
                   style: TextStyle(
                     fontSize: screenHeight * 0.018,
-                    color: Colors.black,
                     fontWeight: FontWeight.bold,
-                    decoration: payment.status == 'RECEIVED'
-                        ? TextDecoration.lineThrough
-                        : TextDecoration.none,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: ' Inc GST',
-                      style: TextStyle(
-                        fontSize: screenHeight * 0.015,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (payment.status == 'RECEIVED')
-                Container(
-                  width: screenWidth * 0.25,
-                  height: screenHeight * 0.04,
-                  decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(screenHeight * 0.005),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Paid',
-                      style: TextStyle(
-                        fontSize: screenHeight * 0.016,
-                        color: Colors.green,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                )
-              else if (payment.status == 'DUE TODAY')
-                Container(
-                  width: screenWidth * 0.25,
-                  height: screenHeight * 0.04,
-                  decoration: BoxDecoration(
-                    color: Color(0xFFD7C5F4),
-                  ),
-                  child: TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      'Pay Now',
-                      style: TextStyle(
-                        fontSize: screenHeight * 0.016,
-                        color: AppColors.primaryColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                )
-              else
-                Container(
-                  width: screenWidth * 0.3,
-                  height: screenHeight * 0.04,
-                  decoration: BoxDecoration(
-                    color: Color(0xFFD7C5F4),
-                    borderRadius: BorderRadius.circular(screenHeight * 0.005),
-                  ),
-                  child: TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      'Pay in Adv',
-                      style: TextStyle(
-                        fontSize: screenHeight * 0.016,
-                        color: AppColors.primaryColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    color: Colors.black,
                   ),
                 ),
-            ],
+                Icon(Icons.download_rounded, color: Colors.black),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
-    );
-  }
+    ],
+  );
+}
+
+
 
   Widget _buildQuickActionsSection(double screenWidth, double screenHeight) {
     return 
@@ -563,7 +394,8 @@ Widget _buildDashedDivider() {
     );
   }
 
-  void _downloadCostSheet() {
-    // Implement download logic
-  }
+  void _downloadCostSheet() async {
+  await downloadCostSheetPDF(_controller);
+}
+
 }
