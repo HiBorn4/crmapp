@@ -1,3 +1,4 @@
 {
-      "cmake.sourceDirectory": "/home/hi_born/Ensar_Solutions/crmapp/linux/runner"
+      "cmake.sourceDirectory": "/home/hi_born/Ensar_Solutions/crmapp/linux/runner",
+      "idf.pythonInstallPath": "/home/akhilesh/anaconda3/bin/python"
 }
