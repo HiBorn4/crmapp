@@ -15,7 +15,7 @@ class TaskReminderController extends GetxController {
     'July', 'August', 'September', 'October', 'November', 'December',
   ];
 
-  final List<String> filters = ['All 5', 'To Do 2', 'Completed 4', 'Calls 1'];
+  final List<String> filters = ['All', 'To Do', 'Completed', 'Calls', 'Documents'];
   
   final List<Task> tasks = [
     Task(

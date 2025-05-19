@@ -2,6 +2,7 @@
 
 import 'package:crmapp/screens/overview_screen.dart';
 import 'package:crmapp/screens/profile_screen.dart';
+import 'package:crmapp/screens/task_reminder_screen.dart';
 import 'package:crmapp/screens/unit_detail_screen.dart';
 import 'package:crmapp/screens/search_screen.dart';
 import 'package:crmapp/widgets/footer.dart';
@@ -40,7 +41,8 @@ class _HomeScreenState extends State<HomeScreen> {
       HomeContent(userUid: widget.userUid),
       SearchScreen(),
       OverviewScreen(),
-      ProfileScreen(uid: widget.userUid),
+      TaskReminderScreen(),
+
     ];
   }
 
@@ -89,12 +91,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
-              'assets/icons/profile.png',
+              'assets/icons/tasks.png',
               width: 24,
               height: 24,
               color: _selectedIndex == 3 ? Colors.black : Colors.grey,
             ),
-            label: "Profile",
+            label: "Tasks",
           ),
         ],
       ),
@@ -120,51 +122,59 @@ class _HomeContentState extends State<HomeContent> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: Row(
-          children: [
-            SizedBox(width: screenWidth * 0.03),
-            GestureDetector(
-  onTap: () {
-    Get.to(() => ProfileScreen(uid: widget.userUid));
-  },
-  child: ClipOval(
-    child: Image.asset(
-      'assets/home_profile.png',
-      width: screenWidth * 0.11,
-      height: screenWidth * 0.11,
-      fit: BoxFit.cover,
-    ),
-  ),
-)
+  // Ensure the leading area has enough space for the image + padding
+  leadingWidth: screenWidth * 0.15,
 
-          ],
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              _getGreetingMessage(),
-              style: TextStyle(
-                fontSize: Responsive.getFontSize(screenWidth, 18),
-              ),
-            ),
-            Text(
-              controller.userData['name'] ?? 'Nameless',
-              style: TextStyle(
-                fontSize: Responsive.getFontSize(screenWidth, 20),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(3), // Adjust height as needed
-          child: CustomPaint(
-            painter: TaperedLinePainter(),
-            child: SizedBox(width: double.infinity),
+  // Profile image as circular and tappable
+  leading: GestureDetector(
+    onTap: () {
+      Get.to(() => ProfileScreen(uid: widget.userUid));
+    },
+    child: Padding(
+      padding: EdgeInsets.only(left: screenWidth * 0.03),
+      child: ClipOval(
+        child: SizedBox(
+          width: screenWidth * 0.1,
+          height: screenWidth * 0.1,
+          child: Image.asset(
+            'assets/home_profile.png',
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => const Icon(Icons.person),
           ),
         ),
       ),
+    ),
+  ),
+
+  // Title with greeting and name
+  title: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        _getGreetingMessage(),
+        style: TextStyle(
+          fontSize: Responsive.getFontSize(screenWidth, 18),
+        ),
+      ),
+      Text(
+        controller.userData['name'] ?? 'Nameless',
+        style: TextStyle(
+          fontSize: Responsive.getFontSize(screenWidth, 20),
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ],
+  ),
+
+  // Custom bottom line
+  bottom: PreferredSize(
+    preferredSize: const Size.fromHeight(3),
+    child: CustomPaint(
+      painter: TaperedLinePainter(),
+      child: const SizedBox(width: double.infinity),
+    ),
+  ),
+),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
