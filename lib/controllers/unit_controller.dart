@@ -272,8 +272,8 @@ void _parseCostItems() {
             status = "UPCOMING";
             statusColor = Colors.orange;
           } else if (scheduledDate != null && scheduledDate.isBefore(today)) {
-            status = "DUE TODAY";
-            statusColor = Colors.red;
+            status = "DUE ON TODAY";
+            statusColor = Color(0xFF960000);
           } else {
             status = "PENDING";
             statusColor = Colors.grey;

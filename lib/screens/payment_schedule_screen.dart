@@ -250,7 +250,7 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
                     ),
                   ),
                 )
-              else if (payment.status == 'DUE TODAY')
+              else if (payment.status == 'DUE ON TODAY')
                 Container(
                   width: screenWidth * 0.25,
                   height: screenHeight * 0.04,
@@ -266,7 +266,7 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
                         fontSize: screenHeight * 0.016,
                         color: Color(0xFF960000),
                         fontWeight: FontWeight.w700,
-                      ),
+                      ), 
                     ),
                   ),
                 )
