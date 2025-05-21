@@ -59,7 +59,7 @@ class _FooterState extends State<Footer> {
           SizedBox(height: widget.screenWidth * 0.03),
           Text(
             "address",
-            style: GoogleFonts.outfit(
+            style: GoogleFonts.openSans(
               color: Colors.white,
               fontSize: titleSize,
               fontWeight: FontWeight.w600,
@@ -69,8 +69,8 @@ class _FooterState extends State<Footer> {
           const SizedBox(height: 6),
           Text(
             "#1,HSR Sector 1, Bangalore, Karnataka-560049",
-            style: GoogleFonts.outfit(
-              color: const Color(0xff737576),
+            style: GoogleFonts.openSans(
+              color: const Color(0xff606062),
               fontSize: fontSize,
               fontWeight: FontWeight.w600,
             ),
@@ -81,8 +81,8 @@ class _FooterState extends State<Footer> {
             onTap: Footer._launchMap,
             child: Text(
               "View in Map",
-              style: GoogleFonts.outfit(
-                color: const Color(0xff737576),
+              style: GoogleFonts.openSans(
+                color: const Color(0xff606062),
                 fontSize: fontSize,
                 fontWeight: FontWeight.w400,
                 decoration: TextDecoration.underline,
@@ -92,7 +92,7 @@ class _FooterState extends State<Footer> {
           SizedBox(height: widget.screenWidth * 0.06),
           Text(
             "Contact Us",
-            style: GoogleFonts.outfit(
+            style: GoogleFonts.openSans(
               color: Colors.white,
               fontSize: titleSize,
               fontWeight: FontWeight.w600,
@@ -101,17 +101,17 @@ class _FooterState extends State<Footer> {
           SizedBox(height: widget.screenWidth * 0.015),
           Text(
             "+91 1234567890 || www.shubaexample.com",
-            style: GoogleFonts.outfit(
-              color: const Color(0xff737576),
+            style: GoogleFonts.openSans(
+              color: const Color(0xff606062),
               fontSize: fontSize,
-              fontWeight: FontWeight.w400,
+              fontWeight: FontWeight.w600,
             ),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: widget.screenWidth * 0.07),
           Text(
             "our website",
-            style: GoogleFonts.outfit(
+            style: GoogleFonts.openSans(
               color: Colors.white,
               fontSize: titleSize,
               fontWeight: FontWeight.w600,
@@ -120,7 +120,7 @@ class _FooterState extends State<Footer> {
           SizedBox(height: widget.screenWidth * 0.07),
           Text(
             "Report",
-            style: GoogleFonts.outfit(
+            style: GoogleFonts.openSans(
               color: Colors.white,
               fontSize: titleSize,
               fontWeight: FontWeight.w600,
@@ -130,8 +130,8 @@ class _FooterState extends State<Footer> {
           Center(
             child: Text(
               "connect with us",
-              style: GoogleFonts.outfit(
-                color: const Color(0xff737576),
+              style: GoogleFonts.openSans(
+                color: const Color(0xff606062),
                 fontSize: titleSize,
                 fontWeight: FontWeight.w600,
               ),
@@ -142,8 +142,11 @@ class _FooterState extends State<Footer> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _buildSocialIcon('assets/whatsapp.png', iconSize, Footer._launchWhatsApp),
+              SizedBox(width: 18),
               _buildSocialIcon('assets/insta.png', iconSize, Footer._launchInstagram),
+              SizedBox(width: 18),
               _buildSocialIcon('assets/x.png', iconSize, Footer._launchTwitter),
+              SizedBox(width: 18),
               _buildSocialIcon('assets/fb.png', iconSize, Footer._launchFacebook),
             ],
           ),

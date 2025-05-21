@@ -17,7 +17,7 @@ import 'package:intl/intl.dart'; // Add this at the top
 class HomeScreen extends StatefulWidget {
   final String userUid;
 
-  HomeScreen({required this.userUid});
+  const HomeScreen({super.key, required this.userUid});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
         items: [
           BottomNavigationBarItem(
             icon: Image.asset(
-              'assets/icons/home.png',
+              'assets/icons/home1.png',
               width: 24,
               height: 24,
               color: _selectedIndex == 0 ? Colors.black : Colors.grey,
@@ -80,21 +80,21 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
-              'assets/icons/units.png',
+              'assets/icons/overall.png',
               width: 24,
               height: 24,
               color: _selectedIndex == 2 ? Colors.black : Colors.grey,
             ),
-            label: "Units",
+            label: "Overall",
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
-              'assets/icons/profile.png',
+              'assets/icons/tasks.png',
               width: 24,
               height: 24,
               color: _selectedIndex == 3 ? Colors.black : Colors.grey,
             ),
-            label: "Profile",
+            label: "Tasks",
           ),
         ],
       ),
@@ -105,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
 class HomeContent extends StatefulWidget {
   final String userUid;
 
-  HomeContent({required this.userUid});
+  const HomeContent({super.key, required this.userUid});
   @override
   _HomeContentState createState() => _HomeContentState();
 }
@@ -120,23 +120,23 @@ class _HomeContentState extends State<HomeContent> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         leading: Row(
           children: [
             SizedBox(width: screenWidth * 0.03),
             GestureDetector(
-  onTap: () {
-    Get.to(() => ProfileScreen(uid: widget.userUid));
-  },
-  child: ClipOval(
-    child: Image.asset(
-      'assets/home_profile.png',
-      width: screenWidth * 0.11,
-      height: screenWidth * 0.11,
-      fit: BoxFit.cover,
-    ),
-  ),
-)
-
+              onTap: () {
+                Get.to(() => ProfileScreen(uid: widget.userUid));
+              },
+              child: ClipOval(
+                child: Image.asset(
+                  'assets/home_profile.png',
+                  width: screenWidth * 0.11,
+                  height: screenWidth * 0.11,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
           ],
         ),
         title: Column(
@@ -144,31 +144,48 @@ class _HomeContentState extends State<HomeContent> {
           children: [
             Text(
               _getGreetingMessage(),
-              style: TextStyle(
+              style: GoogleFonts.outfit(
                 fontSize: Responsive.getFontSize(screenWidth, 18),
               ),
             ),
             Text(
               controller.userData['name'] ?? 'Nameless',
-              style: TextStyle(
+              style: GoogleFonts.outfit(
                 fontSize: Responsive.getFontSize(screenWidth, 20),
                 fontWeight: FontWeight.bold,
               ),
             ),
           ],
         ),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(3), // Adjust height as needed
-          child: CustomPaint(
-            painter: TaperedLinePainter(),
-            child: SizedBox(width: double.infinity),
-          ),
-        ),
+        // bottom: PreferredSize(
+        //   preferredSize: Size.fromHeight(3), // Adjust height as needed
+        //   child: CustomPaint(
+        //     painter: TaperedLinePainter(),
+        //     child: SizedBox(width: double.infinity),
+        //   ),
+        // ),
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Center(
+              child: Container(
+                width: screenHeight * 0.35,
+                height: 1,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Colors.transparent,
+                      Colors.grey.shade400,
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+            ),
             Container(
               color: Colors.white,
               child: SingleChildScrollView(
@@ -188,13 +205,7 @@ class _HomeContentState extends State<HomeContent> {
                 ),
               ),
             ),
-            PreferredSize(
-              preferredSize: Size.fromHeight(10), // Adjust height as needed
-              child: CustomPaint(
-                painter: TaperedLinePainter(),
-                child: SizedBox(width: double.infinity),
-              ),
-            ),
+           
             _buildListItemSection(screenWidth, screenHeight),
             SizedBox(height: screenHeight * 0.15),
             Footer(screenWidth),
@@ -226,11 +237,15 @@ class _HomeContentState extends State<HomeContent> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'UNIT SUMMARY',
-          style: TextStyle(
-            fontSize: Responsive.getFontSize(screenWidth, 15),
-            fontWeight: FontWeight.w500,
+        Padding(
+          padding: const EdgeInsets.only(left: 6.0),
+          child: Text(
+            'UNIT SUMMARY',
+            style: GoogleFonts.outfit(
+              fontSize: Responsive.getFontSize(screenWidth, 15),
+              fontWeight: FontWeight.w500,
+              color: Color(0xff606062),
+            ),
           ),
         ),
         SizedBox(height: screenHeight * 0.015),
@@ -265,11 +280,15 @@ class _HomeContentState extends State<HomeContent> {
       () => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'CATEGORY',
-            style: TextStyle(
-              fontSize: Responsive.getFontSize(screenWidth, 15),
-              fontWeight: FontWeight.w500,
+          Padding(
+            padding: const EdgeInsets.only(left: 6.0),
+            child: Text(
+              'CATEGORY',
+              style: GoogleFonts.outfit(
+                fontSize: Responsive.getFontSize(screenWidth, 15),
+                fontWeight: FontWeight.w500,
+                color: Color(0xff606062)
+              ),
             ),
           ),
           SizedBox(height: screenHeight * 0.015),
@@ -338,7 +357,7 @@ class _HomeContentState extends State<HomeContent> {
               height: diameter,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isSelected ? const Color(0xFFE6E0FA) : Colors.white,
+                color: isSelected ? const Color(0xffEDE9FE) : Colors.white,
                 border:
                     isSelected
                         ? null
@@ -347,17 +366,17 @@ class _HomeContentState extends State<HomeContent> {
               alignment: Alignment.center,
               child: Text(
                 value,
-                style: TextStyle(
+                style: GoogleFonts.outfit(
                   fontSize: radius * 0.5,
-                  fontWeight: FontWeight.bold,
-                  color: isSelected ? Colors.black : Colors.grey,
+                  fontWeight: FontWeight.w600,
+                  color: isSelected ? const Color(0xff0E0A1F) : Colors.grey,
                 ),
               ),
             ),
             SizedBox(height: screenWidth * 0.03),
             Text(
               label,
-              style: TextStyle(
+              style: GoogleFonts.outfit(
                 fontSize: radius * 0.3,
                 color: isSelected ? Colors.black : Colors.grey,
               ),
@@ -391,7 +410,7 @@ class _HomeContentState extends State<HomeContent> {
                 Text(
                   'Oops No Data Found...',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: GoogleFonts.outfit(
                     fontSize: screenWidth * 0.045,
                     color: Colors.black,
                     fontWeight: FontWeight.w900,
@@ -416,8 +435,10 @@ class _HomeContentState extends State<HomeContent> {
             itemBuilder:
                 (context, index) => Padding(
                   padding: EdgeInsets.only(
-                    bottom: screenHeight * 0.01,
-                  ), // adjust spacing as needed
+                    bottom: screenHeight * 0.002,
+                    left: 10,
+                    right: 10
+                  ), 
                   child: _buildListItem(
                     categoryItems[index],
                     screenWidth,
@@ -481,18 +502,18 @@ class _HomeContentState extends State<HomeContent> {
                     children: [
                       Text(
                         'Unit No',
-                        style: TextStyle(
+                        style: GoogleFonts.outfit(
                           fontSize: screenWidth * 0.03,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600,
+                          color: Color(0xff0E0A1F),
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
                       Text(
                         unitNo,
-                        style: TextStyle(
-                          color: Colors.black,
+                        style: GoogleFonts.outfit(
+                          color: Color(0xff0E0A1F),
                           fontSize: screenWidth * 0.035,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
@@ -507,23 +528,26 @@ class _HomeContentState extends State<HomeContent> {
                 children: [
                   Text(
                     name,
-                    style: TextStyle(
+                    style: GoogleFonts.openSans(
                       fontSize: screenWidth * 0.04,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xff0E0A1F),
                     ),
                   ),
                   Text(
                     "Shuba Ecostone",
-                    style: TextStyle(
+                    style: GoogleFonts.openSans(
                       fontSize: screenWidth * 0.03,
-                      color: Colors.grey[600],
+                      color: Color(0xff606062),
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
                   Text(
                     "Last Activity: 180 Days",
-                    style: TextStyle(
+                    style: GoogleFonts.openSans(
                       fontSize: screenWidth * 0.03,
-                      color: Colors.grey[600],
+                      color: Color(0xff606062),
+                      fontWeight: FontWeight.w400
                     ),
                   ),
                 ],
@@ -535,11 +559,11 @@ class _HomeContentState extends State<HomeContent> {
                 // Row of colored dots
                 Row(
                   children: [
-                    _buildDot(Colors.yellow, screenWidth),
+                    _buildDot(Color(0xffEAB300), screenWidth),
                     SizedBox(width: screenWidth * 0.01),
-                    _buildDot(Colors.green, screenWidth),
+                    _buildDot(Color(0xff1B6600), screenWidth),
                     SizedBox(width: screenWidth * 0.01),
-                    _buildDot(Colors.red, screenWidth),
+                    _buildDot(Color(0xff960000), screenWidth),
                   ],
                 ),
                 SizedBox(height: screenWidth * 0.015),
@@ -547,10 +571,10 @@ class _HomeContentState extends State<HomeContent> {
                 // Due text
                 Text(
                   'Due in 2 days',
-                  style: TextStyle(
-                    color: Colors.red,
+                  style: GoogleFonts.outfit(
+                    color: Color(0xff960000),
                     fontSize: screenWidth * 0.03,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
                 SizedBox(height: screenWidth * 0.01),
@@ -558,9 +582,10 @@ class _HomeContentState extends State<HomeContent> {
                 // Amount
                 Text(
                   '₹ $formattedAmount',
-                  style: TextStyle(
-                    fontSize: screenWidth * 0.038,
-                    fontWeight: FontWeight.bold,
+                  style: GoogleFonts.outfit(
+                    fontSize: screenWidth * 0.04,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xff0E0A1F),
                   ),
                 ),
               ],
@@ -578,6 +603,4 @@ class _HomeContentState extends State<HomeContent> {
       decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
-
-  
 }

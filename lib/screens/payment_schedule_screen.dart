@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../controllers/payment_schedule_controller.dart';
 import '../controllers/unit_controller.dart';
 import '../models/payment_entry_model.dart';
@@ -68,14 +69,14 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
         children: [
           Text(
             'Payment Schedule',
-            style: TextStyle(
+            style: GoogleFonts.outfit(
               fontSize: screenHeight * 0.022,
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
             'Shuba Ecostone - 131',
-            style: TextStyle(fontSize: screenHeight * 0.016),
+            style: GoogleFonts.outfit(fontSize: screenHeight * 0.016),
           ),
         ],
       ),
@@ -90,7 +91,7 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
         children: [
           Text(
             'TOTAL BALANCE',
-            style: TextStyle(
+            style: GoogleFonts.outfit(
               fontSize: screenHeight * 0.018,
               color: Colors.grey,
             ),
@@ -102,7 +103,7 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
             builder: (context, value, _) {
               return Text(
                 formatIndianCurrency(value),
-                style: TextStyle(
+                style: GoogleFonts.outfit(
                   fontSize: screenHeight * 0.035,
                   fontWeight: FontWeight.bold,
                 ),
@@ -166,7 +167,7 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
                     child: Center(
                       child: Text(
                         payment.number,
-                        style: TextStyle(
+                        style: GoogleFonts.outfit(
                           fontSize: screenHeight * 0.015,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -177,7 +178,7 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
                   SizedBox(width: screenWidth * 0.04),
                   Text(
                     payment.date,
-                    style: TextStyle(
+                    style: GoogleFonts.outfit(
                       fontSize: screenHeight * 0.016,
                       color: Colors.grey,
                       fontWeight: FontWeight.bold,
@@ -187,7 +188,7 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
               ),
               Text(
                 payment.status,
-                style: TextStyle(
+                style: GoogleFonts.outfit(
                   fontSize: screenHeight * 0.016,
                   color: payment.statusColor,
                   fontWeight: FontWeight.w600,
@@ -198,7 +199,7 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
           SizedBox(height: screenHeight * 0.01),
           Text(
             payment.description,
-            style: TextStyle(
+            style: GoogleFonts.outfit(
               fontSize: screenHeight * 0.018,
               fontWeight: FontWeight.bold,
             ),
@@ -210,7 +211,7 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
               RichText(
                 text: TextSpan(
                   text: payment.amount,
-                  style: TextStyle(
+                  style: GoogleFonts.outfit(
                     fontSize: screenHeight * 0.018,
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -222,7 +223,7 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
                   children: [
                     TextSpan(
                       text: ' Inc GST',
-                      style: TextStyle(
+                      style: GoogleFonts.outfit(
                         fontSize: screenHeight * 0.015,
                         color: Colors.grey,
                         fontWeight: FontWeight.normal,
@@ -242,7 +243,7 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
                   child: Center(
                     child: Text(
                       'Paid',
-                      style: TextStyle(
+                      style: GoogleFonts.outfit(
                         fontSize: screenHeight * 0.016,
                         color: Colors.green,
                         fontWeight: FontWeight.bold,
@@ -262,7 +263,7 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
                     onPressed: () {},
                     child: Text(
                       'Delayed',
-                      style: TextStyle(
+                      style: GoogleFonts.outfit(
                         fontSize: screenHeight * 0.016,
                         color: Color(0xFF960000),
                         fontWeight: FontWeight.w700,
@@ -282,7 +283,7 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
                     onPressed: () {},
                     child: Text(
                       'Pay in Adv',
-                      style: TextStyle(
+                      style: GoogleFonts.outfit(
                         fontSize: screenHeight * 0.016,
                         color: AppColors.primaryColor,
                         fontWeight: FontWeight.w600,
@@ -305,7 +306,7 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
           padding: EdgeInsets.symmetric(vertical: screenHeight * 0.015),
           child: Text(
             'QUICK ACTIONS',
-            style: TextStyle(
+            style: GoogleFonts.outfit(
               fontSize: screenHeight * 0.02,
               fontWeight: FontWeight.bold,
             ),
@@ -339,14 +340,14 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
       child: ListTile(
         title: Text(
           action.title,
-          style: TextStyle(
+          style: GoogleFonts.outfit(
             fontSize: screenHeight * 0.018,
             fontWeight: FontWeight.bold,
           ),
         ),
         subtitle: Text(
           action.description,
-          style: TextStyle(fontSize: screenHeight * 0.015, color: Colors.grey),
+          style: GoogleFonts.outfit(fontSize: screenHeight * 0.015, color: Colors.grey),
         ),
         trailing: Icon(Icons.arrow_forward_ios, size: screenHeight * 0.02),
         onTap: () => _handleQuickAction(action.title),

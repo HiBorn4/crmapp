@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../controllers/unit_controller.dart';
 import '../models/cost_item_model.dart';
@@ -99,14 +100,14 @@ _buildSection(
         children: [
           Text(
             'Cost Sheet',
-            style: TextStyle(
+            style: GoogleFonts.outfit(
               fontSize: screenHeight * 0.022,
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
             'Shuba Ecostone - 131',
-            style: TextStyle(
+            style: GoogleFonts.outfit(
               fontSize: screenHeight * 0.016,
             ),
           ),
@@ -120,7 +121,7 @@ _buildSection(
     children: [
       Text(
         'TOTAL UNIT COST',
-        style: TextStyle(
+        style: GoogleFonts.outfit(
           fontSize: screenHeight * 0.01,
           color: Colors.grey.shade800,
           fontWeight: FontWeight.w800
@@ -135,7 +136,7 @@ _buildSection(
             builder: (context, value, _) {
               return Text(
                 formatIndianCurrency(value),
-                style: TextStyle(
+                style: GoogleFonts.outfit(
                   fontSize: screenHeight * 0.035,
                   fontWeight: FontWeight.bold,
                 ),
@@ -170,7 +171,7 @@ _buildSection(
           children: [
             Text(
               title,
-              style: TextStyle(
+              style: GoogleFonts.outfit(
                 fontSize: screenHeight * 0.016,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
@@ -178,7 +179,7 @@ _buildSection(
             ),
             Text(
               'Price',
-              style: TextStyle(
+              style: GoogleFonts.outfit(
                 fontSize: screenHeight * 0.016,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
@@ -221,7 +222,7 @@ Widget _buildCostItem(CostItem item, double screenWidth, double screenHeight) {
           children: [
             Text(
               item.description,
-              style: TextStyle(
+              style: GoogleFonts.outfit(
                 fontSize: screenHeight * 0.015,
                 fontWeight: FontWeight.w500,
                 color: Colors.black,
@@ -230,7 +231,7 @@ Widget _buildCostItem(CostItem item, double screenWidth, double screenHeight) {
             if (item.details.isNotEmpty)
               Text(
                 item.details,
-                style: TextStyle(
+                style: GoogleFonts.outfit(
                   fontSize: screenHeight * 0.016,
                   color: Colors.black,
                 ),
@@ -239,7 +240,7 @@ Widget _buildCostItem(CostItem item, double screenWidth, double screenHeight) {
         ),
         Text(
           item.amount,
-          style: TextStyle(
+          style: GoogleFonts.outfit(
             fontSize: screenHeight * 0.016,
             fontWeight: FontWeight.bold,
             color: Colors.black,
@@ -283,14 +284,14 @@ Widget _buildDashedDivider() {
       children: [
         Text(
           'Total',
-          style: TextStyle(
+          style: GoogleFonts.outfit(
             fontSize: screenHeight * 0.015,
             fontWeight: FontWeight.bold,
           ),
         ),
         Text(
           formatIndianCurrency(total),
-          style: TextStyle(
+          style: GoogleFonts.outfit(
             fontSize: screenHeight * 0.016,
             fontWeight: FontWeight.bold,
             color: Colors.black,
@@ -320,7 +321,7 @@ Widget download(double screenWidth, double screenHeight) {
                 SizedBox(width: screenWidth * 0.02),
                 Text(
                   'Download',
-                  style: TextStyle(
+                  style: GoogleFonts.outfit(
                     fontSize: screenHeight * 0.018,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
@@ -349,7 +350,7 @@ Widget download(double screenWidth, double screenHeight) {
           padding: EdgeInsets.symmetric(vertical: screenHeight * 0.015),
           child: Text(
             'QUICK ACTIONS',
-            style: TextStyle(
+            style: GoogleFonts.outfit(
               fontSize: screenHeight * 0.02,
               fontWeight: FontWeight.bold,
             ),
@@ -378,12 +379,12 @@ Widget download(double screenWidth, double screenHeight) {
       ),
       child: ListTile(
         title: Text(action.title,
-            style: TextStyle(
+            style: GoogleFonts.outfit(
               fontSize: screenHeight * 0.018,
               fontWeight: FontWeight.bold,
             )),
         subtitle: Text(action.description,
-            style: TextStyle(
+            style: GoogleFonts.outfit(
               fontSize: screenHeight * 0.015,
               color: Colors.grey,
             )),
