@@ -17,53 +17,47 @@ class DonutChart extends StatelessWidget {
   });
 
   @override
-Widget build(BuildContext context) {
-  final bool isValid = total > 0;
-  final int remainingBalance = isValid ? (total - paid).round() : 0;
-  final int percentage = isValid ? ((paid / total) * 100).round() : 0;
+  Widget build(BuildContext context) {
+    final bool isValid = total > 0;
+    final int percentage = isValid ? ((paid / total) * 100).round() : 0;
 
-  return SizedBox(
-    width: size * 1.2,
-    height: size * 1.2,
-    child: Stack(
-      alignment: Alignment.center,
-      children: [
-        CustomPaint(
-          size: Size(size, size),
-          painter: _DonutChartPainter(
-            paid: isValid ? paid : 0,
-            total: isValid ? total : 1, // Prevent division by 0
-            paidColor: paidColor,
-            eligibleColor: eligibleColor,
+    return SizedBox(
+      width: size,
+      height: size / 2,
+      child: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          CustomPaint(
+            size: Size(size, size / 2),
+            painter: _SpeedometerPainter(
+              paid: isValid ? paid : 0,
+              total: isValid ? total : 1, // avoid div by 0
+              paidColor: paidColor,
+              eligibleColor: eligibleColor,
+            ),
           ),
-        ),
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
+          Positioned(
+            bottom: 0,
+            child: Text(
               "$percentage%",
               style: TextStyle(
-                fontSize: size * 0.16,
+                fontSize: size * 0.15,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
               ),
             ),
-          ],
-        ),
-      ],
-    ),
-  );
+          ),
+        ],
+      ),
+    );
+  }
 }
-
-}
-
-class _DonutChartPainter extends CustomPainter {
+class _SpeedometerPainter extends CustomPainter {
   final double paid;
   final double total;
   final Color paidColor;
   final Color eligibleColor;
 
-  _DonutChartPainter({
+  _SpeedometerPainter({
     required this.paid,
     required this.total,
     required this.paidColor,
@@ -72,43 +66,27 @@ class _DonutChartPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final double strokeWidth = size.width * 0.2; // Increased thickness
-    final Offset center = Offset(size.width / 2, size.height / 2);
-    final double radius = (size.width - strokeWidth) * 0.9;
-    final double paidPercentage = paid / total;
+    final double strokeWidth = size.height * 0.15; // Reduced thickness
+    final Offset center = Offset(size.width / 2, size.height + strokeWidth / 2);
+    final double radius = size.width / 1.4 - strokeWidth / 1.4; // Larger radius
 
+    final double paidPercentage = paid / total;
+    final double startAngle = math.pi; // 180 degrees (left)
+    final double sweepAngle = math.pi; // 180 degrees (half circle)
+
+    final Rect arcRect = Rect.fromCircle(center: center, radius: radius);
     final Paint paint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.butt; // Keeps edges sharp
+      ..strokeCap = StrokeCap.round;
 
-    // Draw remaining balance (Grey)
-paint.color = Colors.grey[300]!;
-canvas.drawCircle(center, radius, paint);
+    // Draw balance (grey) first - full semi-circle
+    paint.color = eligibleColor;
+    canvas.drawArc(arcRect, startAngle, sweepAngle, false, paint);
 
-// Draw eligible balance (Lavender)
-paint.color = Color(0XFFDBD3FD);
-canvas.drawArc(
-  Rect.fromCircle(center: center, radius: radius),
-  -math.pi / 2,
-  (1 - paidPercentage) * 2 * math.pi,
-  false,
-  paint,
-);
-
-// Draw paid arc (Main color)
-if (paid > 0) {
-  final double paidAngle = paidPercentage * 2 * math.pi;
-  paint.color = paidColor;
-  canvas.drawArc(
-    Rect.fromCircle(center: center, radius: radius),
-    -math.pi / 2, // Start from the top
-    paidAngle,
-    false,
-    paint,
-  );
-}
-
+    // Draw paid (purple) arc
+    paint.color = paidColor;
+    canvas.drawArc(arcRect, startAngle, paidPercentage * sweepAngle, false, paint);
   }
 
   @override

@@ -21,7 +21,7 @@ class PaymentScheduleController extends GetxController {
       description: 'On execution of Agreement',
       amount: '₹ 2,50,000',
       status: 'DUE TODAY',
-      statusColor: Colors.red,
+      statusColor: Color(0xFF960000),
     ),
     PaymentEntry(
       number: '03',

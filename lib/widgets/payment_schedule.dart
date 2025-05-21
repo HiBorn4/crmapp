@@ -55,11 +55,11 @@ String _formatIndianCurrency(int amount) {
         color: Colors.white,
         borderRadius: BorderRadius.circular(widget.screenHeight * 0.01),
         boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: widget.screenHeight * 0.002,
-            blurRadius: widget.screenHeight * 0.01,
-          ),
+          // BoxShadow(
+            // color: Colors.grey.withOpacity(0.2),
+            // spreadRadius: widget.screenHeight * 0.002,
+            // blurRadius: widget.screenHeight * 0.01,
+          // ),
         ],
       ),
       child: Column(

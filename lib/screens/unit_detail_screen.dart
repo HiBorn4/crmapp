@@ -1,6 +1,7 @@
 import 'package:crmapp/screens/activity_log_screen.dart';
 import 'package:crmapp/screens/cost_sheet_screen.dart';
 import 'package:crmapp/screens/modification_screen.dart';
+import 'package:crmapp/screens/transaction_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_direct_caller_plugin/flutter_direct_caller_plugin.dart';
 import 'package:get/get.dart';
@@ -12,8 +13,9 @@ import '../widgets/dimension_graph_chart.dart';
 import '../utils/responsive.dart';
 import '../widgets/donut_chart.dart';
 import '../widgets/payment_schedule.dart';
-  import 'package:intl/intl.dart';
+import 'package:intl/intl.dart';
 
+import '../widgets/unit_dimensions.dart';
 import 'payment_schedule_screen.dart';
 
 class UnitDetailScreen extends StatefulWidget {
@@ -61,9 +63,9 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildUnitChart(screenWidth),
+            _buildUnitChart(screenWidth, screenHeight),
             SizedBox(height: screenHeight * 0.03),
-            _buildUnitSummary(screenWidth, screenHeight),
+            _buildMilestoneSection(screenWidth, screenHeight),
             SizedBox(height: screenHeight * 0.03),
 
             _buildCategory(screenWidth, screenHeight),
@@ -71,41 +73,11 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
             _buildPaymentList(screenWidth, screenHeight),
 
             SizedBox(height: screenHeight * 0.03),
-
-_buildSection(
-  'Additional Charges',
-  _controller.additionalCharges,
-  screenWidth,
-  screenHeight,
-  _controller.tA.value,  // Access the value using .value
-),
-_buildSection(
-  'Construction Charges',
-  _controller.constructionCharges,
-  screenWidth,
-  screenHeight,
-  _controller.tB.value,  // Access the value using .value
-),
-_buildSection(
-  'Construction Additional Charges',
-  _controller.constructionAdditionalCharges,
-  screenWidth,
-  screenHeight,
-  _controller.tC.value,  // Access the value using .value
-),
-_buildSection(
-  'Possession Charges',
-  _controller.possessionCharges,
-  screenWidth,
-  screenHeight,
-  _controller.tD.value,  // Access the value using .value
-),
-
-
-
-            _buildApplicantDetails(context, _tabController),
-
-            // _buildUnitDimensions(screenWidth, screenHeight),
+            _buildCostSheetSection(screenWidth, screenHeight),
+            SizedBox(height: screenHeight * 0.03),
+            _buildApplicantDetailsCard(screenWidth, screenHeight),
+            SizedBox(height: screenHeight * 0.03),
+            _buildUnitDimensions(screenWidth, screenHeight),
           ],
         ),
       ),
@@ -113,41 +85,40 @@ _buildSection(
   }
 
   AppBar _buildAppBar(double screenWidth) {
-  return AppBar(
-    automaticallyImplyLeading: false,
-    leading: Padding(
-      padding: EdgeInsets.only(left: screenWidth * 0.015), // Reduced left padding
-      child: IconButton(
-        icon: Icon(Icons.arrow_back, color: Colors.black),
-        onPressed: () => Get.back(),
+    return AppBar(
+      automaticallyImplyLeading: false,
+      leading: Padding(
+        padding: EdgeInsets.only(
+          left: screenWidth * 0.015,
+        ), // Reduced left padding
+        child: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Get.back(),
+        ),
       ),
-    ),
-    titleSpacing: 0, // Reduces gap between back arrow and title
-    title: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Unit Overview',
-          style: TextStyle(
-            fontSize: Responsive.getFontSize(screenWidth, 20),
-            fontWeight: FontWeight.bold,
+      titleSpacing: 0, // Reduces gap between back arrow and title
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Unit Overview',
+            style: TextStyle(
+              fontSize: Responsive.getFontSize(screenWidth, 20),
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        Text(
-          'Shuba Ecostone - 131',
-          style: TextStyle(
-            fontSize: Responsive.getFontSize(screenWidth, 14),
+          Text(
+            'Shuba Ecostone - 131',
+            style: TextStyle(fontSize: Responsive.getFontSize(screenWidth, 14)),
           ),
-        ),
-      ],
-    ),
-    backgroundColor: Colors.white,
-    elevation: 0,
-  );
-}
+        ],
+      ),
+      backgroundColor: Colors.white,
+      elevation: 0,
+    );
+  }
 
-
-  Widget _buildUnitChart(double screenWidth) {
+  Widget _buildUnitChart(double screenWidth, double screenHeight) {
     RxInt selectedTab = 0.obs; // 0 = Stage Balance, 1 = Unit Cost
     final UnitController _controller = Get.find<UnitController>();
 
@@ -157,17 +128,17 @@ _buildSection(
         children: [
           // Center-Aligned Tab Switcher
           Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _buildTab('Stage Balance', 0, selectedTab, screenWidth),
-                SizedBox(width: 10),
-                _buildTab('Unit Cost', 1, selectedTab, screenWidth),
-                SizedBox(width: 10),
-                _buildTab('Finance Balance', 2, selectedTab, screenWidth),
-              ],
-            ),
-          
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _buildTab('Stage Balance', 0, selectedTab, screenWidth),
+              SizedBox(width: 10),
+              _buildTab('Unit Cost', 1, selectedTab, screenWidth),
+              SizedBox(width: 10),
+              _buildTab('Finance Balance', 2, selectedTab, screenWidth),
+            ],
+          ),
+
           SizedBox(height: screenWidth * 0.04),
 
           // Content Card
@@ -180,8 +151,12 @@ _buildSection(
             ),
             child:
                 selectedTab.value == 0
-                    ? _buildStageBalance(screenWidth, _controller)
-                    : _buildStageBalance(screenWidth, _controller),
+                    ? _buildStageBalance(screenHeight, screenWidth, _controller)
+                    : _buildStageBalance(
+                      screenHeight,
+                      screenWidth,
+                      _controller,
+                    ),
             // _buildUnitCost(screenWidth, _controller),
           ),
         ],
@@ -248,92 +223,146 @@ _buildSection(
     );
   }
 
+  String formatIndianCurrency(double amount) {
+    final roundedAmount = amount.round();
+    final format = NumberFormat.currency(
+      locale: 'en_IN',
+      symbol: '₹',
+      decimalDigits: 0,
+    );
+    return format.format(roundedAmount);
+  }
 
-String formatIndianCurrency(double amount) {
-  final roundedAmount = amount.round();
-  final format = NumberFormat.currency(
-    locale: 'en_IN',
-    symbol: '₹',
-    decimalDigits: 0,
-  );
-  return format.format(roundedAmount);
-}
-
-
-  Widget _buildStageBalance(double screenWidth, UnitController _controller) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Combined title with legends
-        SizedBox(height: screenWidth * 0.03),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(width: screenWidth * 0.08),
-            Expanded(
-              flex: 2,
-              child: DonutChart(
-                paid: _controller.paidAmount.value,
-                total: _controller.totalAmount.value,
-                size: screenWidth * 0.35,
-                paidColor: Color(0XFFDBD3FD),
-                eligibleColor: Colors.grey[400]!,
+  Widget _buildStageBalance(
+    double screenHeight,
+    double screenWidth,
+    UnitController _controller,
+  ) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.07),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: screenWidth * 0.03),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Donut + Legends
+              Expanded(
+                flex: 5,
+                child: SizedBox(
+                  height:
+                      screenWidth *
+                      0.4, // Give enough vertical space to align bottom
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.center, // Center horizontally
+                    mainAxisAlignment:
+                        MainAxisAlignment
+                            .end, // Align children to bottom vertically
+                    children: [
+                      DonutChart(
+                        paid: _controller.paidAmount.value,
+                        total: _controller.totalAmount.value,
+                        size: screenWidth * 0.4,
+                        paidColor: const Color(0XFFDBD3FD),
+                        eligibleColor: Colors.grey[400]!,
+                      ),
+                      SizedBox(height: screenWidth * 0.06),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _legendBox(
+                            Color(0XFFDBD3FD),
+                            'Paid',
+                            screenWidth,
+                            screenHeight,
+                          ),
+                          SizedBox(width: screenWidth * 0.04),
+                          _legendBox(
+                            Colors.grey[400]!,
+                            'Balance',
+                            screenWidth,
+                            screenHeight,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
-            SizedBox(width: screenWidth * 0.15),
-            Expanded(
-  flex: 3,
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      SizedBox(width: 10),
-      SizedBox(width: 10),
-      Text("Balance", style: TextStyle(fontSize: 12)),
-      _buildAmountRow(
-        'Balance',
-        formatIndianCurrency(_controller.totalAmount.value - _controller.paidAmount.value),
-        Colors.grey[400]!,
-      ),
-      SizedBox(height: screenWidth * 0.02),
 
-      _legendBox(Colors.grey[700]!, 'Eligible Cost'),
-      _buildAmountRow(
-        'Eligible Cost',
-        formatIndianCurrency(_controller.totalAmount.value),
-        Colors.grey[700]!,
-      ),
-      SizedBox(height: screenWidth * 0.02),
+              // Spacer between chart and amounts
+              SizedBox(width: screenWidth * 0.15),
 
-      _legendBox(Color(0XFFDBD3FD), 'Paid'),
-      _buildAmountRow(
-        'Paid',
-        formatIndianCurrency(_controller.paidAmount.value),
-        Colors.purple[300]!,
+              // Right Side Amounts
+              Expanded(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Balance",
+                      style: TextStyle(fontSize: screenHeight * 0.015),
+                    ),
+                    _buildAmountRow(
+                      'Balance',
+                      formatIndianCurrency(
+                        _controller.totalAmount.value -
+                            _controller.paidAmount.value,
+                      ),
+                      Colors.grey[400]!,
+                    ),
+                    SizedBox(height: screenWidth * 0.02),
+                    Text(
+                      'Eligible Cost',
+                      style: TextStyle(fontSize: screenHeight * 0.015),
+                    ),
+                    _buildAmountRow(
+                      'Eligible Cost',
+                      formatIndianCurrency(_controller.totalAmount.value),
+                      Colors.grey[700]!,
+                    ),
+                    SizedBox(height: screenWidth * 0.02),
+                    Text(
+                      'Paid',
+                      style: TextStyle(fontSize: screenHeight * 0.015),
+                    ),
+                    _buildAmountRow(
+                      'Paid',
+                      formatIndianCurrency(_controller.paidAmount.value),
+                      Colors.purple[300]!,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
-    ],
-  ),
-),
-
-          ],
-        ),
-      ],
     );
   }
 
-  Widget _legendBox(Color color, String label) {
+  Widget _legendBox(
+    Color color,
+    String label,
+    double screenWidth,
+    double screenHeight,
+  ) {
     return Row(
       children: [
         Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.rectangle,
-            borderRadius: BorderRadius.circular(2),
+          width: screenWidth * 0.04, // ~10px on 400px screen
+          height: screenWidth * 0.04,
+          decoration: BoxDecoration(color: color, shape: BoxShape.rectangle),
+        ),
+        SizedBox(width: screenWidth * 0.015),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: screenHeight * 0.016, // Scales based on screen height
           ),
         ),
-        SizedBox(width: 4),
-        Text(label, style: TextStyle(fontSize: 12)),
       ],
     );
   }
@@ -365,121 +394,97 @@ String formatIndianCurrency(double amount) {
     );
   }
 
-  Widget _buildUnitSummary(double screenWidth, double screenHeight) {
-    final data = _controller.projectData;
-    print(data);
-
-    return Obx(
-      () => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Heading
-          Text(
-            'UNIT SUMMARY',
+  Widget _buildMilestoneSection(double screenWidth, double screenHeight) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'UPCOMING EVENTS',
+          style: TextStyle(
+            fontSize: Responsive.getFontSize(screenWidth, 14),
+            fontWeight: FontWeight.bold,
+            color: Color(0XFF606062),
+          ),
+        ),
+        _milestoneCard(
+          screenWidth,
+          title: 'Eligible Due',
+          value: '₹ 22,76,36,500',
+          trailing: Text(
+            'Due in 2 days',
             style: TextStyle(
-              fontSize: Responsive.getFontSize(screenWidth, 14),
-              fontWeight: FontWeight.bold,
+              color: Color(0XFF960000),
+              fontSize: screenWidth * 0.027,
+              fontWeight: FontWeight.w600,
             ),
           ),
-          SizedBox(height: screenWidth * 0.03),
-          _buildListItem(data, screenWidth, screenHeight),
-        ],
-      ),
+        ),
+        _milestoneCard(
+          screenWidth,
+          title: 'Next Milestone',
+          value: 'Registration in 2 Days',
+        ),
+        _milestoneCard(
+          screenWidth,
+          title: 'Upcoming Milestone',
+          value: 'Video KYC',
+        ),
+      ],
     );
   }
 
-  Widget _buildListItem(
-    Map<String, dynamic> item,
-    double screenWidth,
-    double screenHeight,
-  ) {
-    // Safely extract values with null checks
-    final unitNo = item['unit_no']?.toString() ?? 'N/A';
-    final name =
-        item['customerDetailsObj']?['customerName1']?.toString() ?? 'N/A';
-    final contact =
-        item['customerDetailsObj']?['phoneNo1']?.toString() ?? 'No Contact';
-
-    return GestureDetector(
-      onTap: () => Get.to(() => ModificationScreen()),
-      child: Container(
-        margin: EdgeInsets.only(bottom: screenHeight * 0.01),
-        padding: EdgeInsets.all(screenWidth * 0.03),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 5,
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Column(
+  Widget _milestoneCard(
+    double screenWidth, {
+    required String title,
+    required String value,
+    Widget? trailing,
+  }) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: screenWidth * 0.015),
+      padding: EdgeInsets.symmetric(
+        horizontal: screenWidth * 0.04,
+        vertical: screenWidth * 0.01,
+      ),
+      decoration: BoxDecoration(color: Colors.white),
+      child: Row(
+        children: [
+          // Left side
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: screenWidth * 0.1,
-                  height: screenWidth * 0.1,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(screenWidth * 0.06),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    unitNo,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: screenWidth * 0.035,
-                      fontWeight: FontWeight.bold,
+                Row(
+                  children: [
+                    Image.asset(
+                      'assets/icons/unit_screen_diamond.png', // Replace with your asset path
+                      width: screenWidth * 0.035,
+                      height: screenWidth * 0.035,
                     ),
-                  ),
+                    SizedBox(width: screenWidth * 0.01),
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.032,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: screenHeight * 0.005),
+                SizedBox(height: screenWidth * 0.005),
                 Text(
-                  'Unit No',
+                  value,
                   style: TextStyle(
                     fontSize: screenWidth * 0.035,
-                    color: Colors.grey[600],
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
             ),
-            SizedBox(width: screenWidth * 0.04),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.04,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.005),
-                  Text(
-                    contact,
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.035,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            IconButton(
-              icon: Icon(Icons.call, size: screenWidth * 0.07),
-              onPressed: () {
-                String phoneNumber = contact.replaceAll(" ", "");
-                print(phoneNumber);
-                FlutterDirectCallerPlugin.callNumber(phoneNumber);
-              },
-            ),
-          ],
-        ),
+          ),
+
+          // Right side (if provided)
+          if (trailing != null) trailing!,
+        ],
       ),
     );
   }
@@ -488,47 +493,69 @@ String formatIndianCurrency(double amount) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'CATEGORY',
-          style: TextStyle(
-            fontSize: Responsive.getFontSize(screenWidth, 14),
-            fontWeight: FontWeight.bold,
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'CATEGORY',
+              style: TextStyle(
+                fontSize: Responsive.getFontSize(screenWidth, 14),
+                fontWeight: FontWeight.bold,
+                color: const Color(0XFF606062),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Get.toNamed('/allCategories');
+              },
+              child: Text(
+                'View All',
+                style: TextStyle(
+                  fontSize: Responsive.getFontSize(screenWidth, 14),
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0XFF606062),
+                ),
+              ),
+            ),
+          ],
         ),
         SizedBox(height: screenHeight * 0.02),
         Row(
-          mainAxisAlignment:
-              MainAxisAlignment.spaceAround, // Ensures equal spacing
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildCategoryItem(
               screenWidth,
               screenHeight,
-              Icons.receipt_long,
+              'assets/icons/cost_sheet.png',
               "Cost Sheet",
-              () => Get.to(() => CostSheetScreen(widget.projectUid, widget.userUid)),
+              () => Get.to(
+                () => CostSheetScreen(widget.projectUid, widget.userUid),
+              ),
             ),
             _buildCategoryItem(
               screenWidth,
               screenHeight,
-              Icons.schedule,
+              'assets/icons/schedule.png',
               "Schedule",
-              () => Get.to(() => PaymentScheduleScreen(widget.projectUid, widget.userUid)),
+              () => Get.to(
+                () => PaymentScheduleScreen(widget.projectUid, widget.userUid),
+              ),
             ),
             _buildCategoryItem(
               screenWidth,
               screenHeight,
-              Icons.list,
-              "Activity",
-              () => Get.to(() => ActivityLogScreen(widget.projectUid, widget.userUid)),
+              'assets/icons/transaction.png',
+              "Transactions",
+              () => Get.to(() => TransactionScreen()),
             ),
             _buildCategoryItem(
               screenWidth,
               screenHeight,
-              Icons.build,
-              "Modifications",
-              () {
-                Get.toNamed('/modification');
-              },
+              'assets/icons/document.png',
+              "Documents",
+              () => Get.to(
+                () => ActivityLogScreen(widget.projectUid, widget.userUid),
+              ),
             ),
           ],
         ),
@@ -539,7 +566,7 @@ String formatIndianCurrency(double amount) {
   Widget _buildCategoryItem(
     double screenWidth,
     double screenHeight,
-    IconData icon,
+    String iconPath,
     String label,
     VoidCallback onCategoryTap,
   ) {
@@ -548,28 +575,35 @@ String formatIndianCurrency(double amount) {
     double containerSize = screenWidth * 0.15; // Responsive circle size
 
     return Expanded(
-      // Ensures equal spacing for all items
       child: Column(
         children: [
           GestureDetector(
             onTap: onCategoryTap,
-
             child: Container(
               width: containerSize,
               height: containerSize,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Color(0XFFEDE9FE),
+                color: const Color(0XFFEDE9FE),
               ),
               child: Center(
-                child: Icon(icon, size: iconSize, color: Colors.black),
+                child: Image.asset(
+                  iconPath,
+                  width: iconSize,
+                  height: iconSize,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
           ),
           SizedBox(height: screenHeight * 0.01),
           Text(
             label,
-            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.w500),
+            style: TextStyle(
+              fontSize: textSize,
+              fontWeight: FontWeight.w500,
+              color: const Color(0XFF606062),
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -577,173 +611,14 @@ String formatIndianCurrency(double amount) {
     );
   }
 
-  Widget _buildUnitDimensions(double screenWidth, double screenHeight) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'UNIT DETAILS AND DIMENSIONS',
-          style: TextStyle(
-            fontSize: Responsive.getFontSize(screenWidth, 14),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        SizedBox(height: screenWidth * 0.03),
-        Center(
-          child: Container(
-            height: screenHeight * 0.35, // Adjusted for better fit
-            padding: EdgeInsets.all(screenWidth * 0.04),
-            child: DimensionGraph(
-              screenWidth: screenWidth,
-              screenHeight: screenHeight,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildApplicantDetails(
-    BuildContext context,
-    TabController tabController,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.all(10),
-          child: Text(
-            'APPLICANT DETAILS',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ),
-        SizedBox(
-          height: 400,
-          child: Column(
-            children: [
-              Expanded(
-                child: TabBarView(
-                  controller: tabController,
-                  children: [buildApplicantCard()],
-                ),
-              ),
-              const SizedBox(height: 10),
-              TabPageSelector(
-                controller: tabController,
-                selectedColor: Colors.deepPurple,
-                color: Colors.grey[300],
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget buildApplicantCard() {
-    return Card(
-      elevation: 0,
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero, // 🔺 Sharp corners
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image
-            Container(
-              height: 70,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.zero, // 🔺 Sharp image corners
-                image: const DecorationImage(
-                  image: AssetImage('assets/primary.png'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                buildInfoLine("S/O", _controller.name),
-                buildInfoLine("Pan Card", _controller.panNo),
-              ],
-            ),
-            const SizedBox(height: 10),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                buildInfoLine("Marital Status", _controller.maritalStatus),
-                buildInfoLine("Aadhar Number", _controller.aadharNo),
-              ],
-            ),
-            const SizedBox(height: 10),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                buildInfoLine("DOB", _controller.dob),
-                buildInfoLine("Secondary No", _controller.mobile),
-              ],
-            ),
-            const Divider(height: 25, thickness: 1),
-
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                buildInfoLine("Current Address", _controller.currentAdd),
-                buildInfoLine("Permanent Address", _controller.permAdd),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildInfoHeading(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-        const SizedBox(height: 2),
-        Text(
-          value,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900),
-        ),
-      ],
-    );
-  }
-
-  Widget buildInfoLine(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          value,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-        ),
-      ],
-    );
-  }
-
   Widget _buildPaymentList(double screenWidth, double screenHeight) {
-    return Obx(
-      () => Column(
+    return Obx(() {
+      final payments = _controller.payments;
+      final showAllButton = payments.length > 3;
+      final displayedPayments =
+          showAllButton ? payments.take(3).toList() : payments;
+
+      return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -754,98 +629,246 @@ String formatIndianCurrency(double amount) {
             ),
           ),
           SizedBox(height: screenWidth * 0.03),
+
+          // Display up to 3 payment widgets
           ListView.builder(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
-            itemCount: _controller.payments.length,
+            itemCount: displayedPayments.length,
             itemBuilder:
                 (context, index) => PaymentScheduleWidget(
                   screenWidth: screenWidth,
                   screenHeight: screenHeight,
-                  payment: _controller.payments[index],
+                  payment: displayedPayments[index],
                 ),
           ),
+
+          // Show "View All →" button if more than 3 payments
+          if (showAllButton) ...[
+            SizedBox(height: screenHeight * 0.015),
+            GestureDetector(
+              onTap:
+                  () => Get.to(
+                    () => PaymentScheduleScreen(
+                      widget.projectUid,
+                      widget.userUid,
+                    ),
+                  ),
+              child: Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(
+                  vertical: screenHeight * 0.018,
+                  horizontal: screenWidth * 0.04,
+                ),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade300, width: 1),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'View All',
+                      style: TextStyle(
+                        fontSize: Responsive.getFontSize(screenWidth, 13),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(width: screenWidth * 0.015),
+                    Icon(
+                      Icons.arrow_forward,
+                      size: screenWidth * 0.045,
+                      color: Colors.black,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ],
-      ),
+      );
+    });
+  }
+
+  Widget _buildCostSheetSection(double screenWidth, double screenHeight) {
+    // Mock data list (replace with your real data source)
+    final costItems = [
+      {'label': 'Charge Cost', 'amount': '₹ 22,76,36,500'},
+      {'label': 'Additional Cost', 'amount': '₹ 22,76,36,500'},
+      {'label': 'Construction Cost', 'amount': '₹ 22,76,36,500'},
+      {'label': 'Construction Additional Cost', 'amount': '₹ 22,76,36,500'},
+      {'label': 'Additional Charges', 'amount': '₹ 22,76,36,500'},
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'COST SHEET',
+          style: TextStyle(
+            fontSize: Responsive.getFontSize(screenWidth, 14),
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF606062),
+          ),
+        ),
+        SizedBox(height: screenHeight * 0.015),
+        Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(screenWidth * 0.02),
+            color: Colors.white,
+            boxShadow: [
+              // BoxShadow(
+              // color: Colors.black.withOpacity(0.03),
+              // blurRadius: 6,
+              // offset: const Offset(0, 2),
+              // ),
+            ],
+          ),
+          child: Column(
+            children: List.generate(costItems.length, (index) {
+              final item = costItems[index];
+              return Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: screenHeight * 0.015,
+                      horizontal: screenWidth * 0.04,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            item['label']!,
+                            style: TextStyle(
+                              fontSize: Responsive.getFontSize(
+                                screenWidth,
+                                14.5,
+                              ),
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          item['amount']!,
+                          style: TextStyle(
+                            fontSize: Responsive.getFontSize(screenWidth, 14.5),
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (index != costItems.length - 1)
+                    Divider(height: 1, color: Colors.grey.shade300),
+                ],
+              );
+            }),
+          ),
+        ),
+        SizedBox(height: screenHeight * 0.015),
+        GestureDetector(
+          onTap: () {
+            // Replace with your desired navigation
+            Get.to(() => CostSheetScreen(widget.projectUid, widget.userUid));
+          },
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(
+              vertical: screenHeight * 0.015,
+              horizontal: screenWidth * 0.04,
+            ),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'View all',
+                  style: TextStyle(
+                    fontSize: Responsive.getFontSize(screenWidth, 13),
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(width: screenWidth * 0.015),
+                Icon(
+                  Icons.arrow_forward,
+                  size: screenWidth * 0.045,
+                  color: Colors.black,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildCostItem(
-    CostItem item,
-    double screenWidth,
-    double screenHeight,
-  ) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                item.description,
+  Widget _buildApplicantDetailsCard(double screenWidth, double screenHeight) {
+  List<String> avatarPaths = [
+    'assets/avatar1.png',
+    'assets/avatar2.png',
+    'assets/avatar1.png',
+    // Add more if needed
+  ];
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        'APPLICANT DETAILS',
+        style: TextStyle(
+          fontSize: Responsive.getFontSize(screenWidth, 13),
+          fontWeight: FontWeight.bold,
+          color: const Color(0xFF606062),
+        ),
+      ),
+      SizedBox(height: screenHeight * 0.01),
+      Container(
+        padding: EdgeInsets.symmetric(
+          vertical: screenHeight * 0.015,
+          horizontal: screenWidth * 0.035,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(screenWidth * 0.025),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            buildOverlappingAvatars(
+              screenWidth: screenWidth,
+              avatarPaths: avatarPaths,
+            ),
+            Expanded(
+              child: Text(
+                '${avatarPaths.length} applicants',
                 style: TextStyle(
-                  fontSize: screenHeight * 0.018,
+                  fontSize: Responsive.getFontSize(screenWidth, 13),
                   fontWeight: FontWeight.w500,
                   color: Colors.black,
                 ),
               ),
-              if (item.details.isNotEmpty)
-                Text(
-                  item.details,
-                  style: TextStyle(
-                    fontSize: screenHeight * 0.016,
-                    color: Colors.black,
-                  ),
-                ),
-            ],
-          ),
-
-          Text(
-            item.amount,
-            style: TextStyle(
-              fontSize: screenHeight * 0.018,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSection(
-  String title,
-  List<CostItem> items,
-  double screenWidth,
-  double screenHeight,
-  double total,
-) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Padding(
-        padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
-        child: Text(
-          title,
-          style: TextStyle(
-            fontSize: screenHeight * 0.016,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-      ),
-      Container(
-        color: Colors.white,
-        padding: EdgeInsets.symmetric(horizontal: screenHeight * 0.02),
-        child: Column(
-          children: [
-            ...items.map(
-              (item) => _buildCostItem(item, screenWidth, screenHeight),
+            Text(
+              '1 KYC Pending',
+              style: TextStyle(
+                fontSize: Responsive.getFontSize(screenWidth, 14),
+                fontWeight: FontWeight.bold,
+                color: Color(0XFF960000),
+              ),
             ),
-            _buildDashedDivider(),
-            _buildTotalRow(screenWidth, screenHeight, total),
           ],
         ),
       ),
@@ -854,56 +877,88 @@ String formatIndianCurrency(double amount) {
 }
 
 
-  Widget _buildDashedDivider() {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.0),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final dashWidth = 5.0;
-          final dashSpace = 3.0;
-          final dashCount =
-              (constraints.constrainWidth() / (dashWidth + dashSpace)).floor();
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(
-              dashCount,
-              (index) =>
-                  Container(width: dashWidth, height: 1, color: Colors.black),
-            ),
-          );
-        },
+Widget buildOverlappingAvatars({
+  required double screenWidth,
+  required List<String> avatarPaths,
+}) {
+  double avatarRadius = screenWidth * 0.04;
+  double overlapOffset = screenWidth * 0.045;
+  int maxVisible = 3;
+
+  List<Widget> avatarWidgets = [];
+
+  for (int i = 0; i < avatarPaths.length && i < maxVisible; i++) {
+    avatarWidgets.add(Positioned(
+      left: i * overlapOffset,
+      child: CircleAvatar(
+        radius: avatarRadius,
+        backgroundImage: AssetImage(avatarPaths[i]),
       ),
-    );
+    ));
   }
 
-  Widget _buildTotalRow(
-  double screenWidth,
-  double screenHeight,
-  double total,
-) {
-  return Padding(
-    padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          'Total',
+  if (avatarPaths.length > maxVisible) {
+    int remaining = avatarPaths.length - maxVisible;
+    avatarWidgets.add(Positioned(
+      left: maxVisible * overlapOffset,
+      child: CircleAvatar(
+        radius: avatarRadius,
+        backgroundColor: Colors.grey[300],
+        child: Text(
+          '+$remaining',
           style: TextStyle(
-            fontSize: screenHeight * 0.018,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Text(
-          formatIndianCurrency(total),
-          style: TextStyle(
-            fontSize: screenHeight * 0.018,
-            fontWeight: FontWeight.bold,
+            fontSize: avatarRadius * 0.9,
             color: Colors.black,
+            fontWeight: FontWeight.bold,
           ),
         ),
-      ],
-    ),
+      ),
+    ));
+  }
+
+  return SizedBox(
+    width: (maxVisible + 1) * overlapOffset + avatarRadius,
+    height: avatarRadius * 2,
+    child: Stack(children: avatarWidgets),
   );
 }
 
+
+
+  Widget _buildUnitDimensions(double screenWidth, double screenHeight) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'UNIT DIMENSIONS',
+          style: TextStyle(
+            fontSize: Responsive.getFontSize(screenWidth, 13),
+            fontWeight: FontWeight.bold,
+          color: const Color(0xFF606062),
+          ),
+        ),
+        SizedBox(height: screenWidth * 0.03),
+        Center(
+          // child: Container(
+          //   height: screenHeight * 0.35, // Adjusted for better fit
+          //   padding: EdgeInsets.all(screenWidth * 0.04),
+          //   child: DimensionGraph(
+          //     screenWidth: screenWidth,
+          //     screenHeight: screenHeight,
+          //   ),
+          // ),
+          child: PlotOrientationDiagram(
+  D: 20, // your base unit
+  plotNo: '34',
+  adjacentPlotNo: '33',
+  northIcon: Image.asset('assets/avatar1.png'),
+  southIcon: Image.asset('assets/avatar2.png'),
+  eastIcon: Image.asset('assets/avatar1.png'),
+  westIcon: Image.asset('assets/avatar2.png'),
+  roadLabel: '9MM Road',
+),
+        ),
+      ],
+    );
+  }
 }
