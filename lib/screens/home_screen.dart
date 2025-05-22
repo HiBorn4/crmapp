@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../controllers/home_controller.dart';
-import '../utils/tapered_line_painter.dart';
+// import '../utils/tapered_line_painter.dart';
 import '../widgets/summary_item.dart';
 import '../utils/responsive.dart';
 import 'package:intl/intl.dart'; // Add this at the top

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../controllers/payment_schedule_controller.dart';
+// import '../controllers/payment_schedule_controller.dart';
 import '../controllers/unit_controller.dart';
 import '../models/payment_entry_model.dart';
 import '../models/quick_action_model.dart';
@@ -40,14 +40,33 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
 
     return Scaffold(
       appBar: _buildAppBar(screenWidth, screenHeight),
+
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
           horizontal: screenWidth * 0.04,
-          vertical: screenHeight * 0.02,
+          // vertical: screenHeight * 0.005,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Center(
+              child: Container(
+                width: screenHeight * 0.35,
+                height: 1,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Colors.transparent,
+                      Colors.grey.shade400,
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 28),
             _buildTotalBalance(screenWidth, screenHeight),
             SizedBox(height: screenHeight * 0.03),
             _buildPaymentList(screenWidth, screenHeight),
@@ -71,12 +90,17 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
             'Payment Schedule',
             style: GoogleFonts.outfit(
               fontSize: screenHeight * 0.022,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
+              color: Color(0xff0E0A1F),
             ),
           ),
           Text(
             'Shuba Ecostone - 131',
-            style: GoogleFonts.outfit(fontSize: screenHeight * 0.016),
+            style: GoogleFonts.outfit(
+              fontSize: screenHeight * 0.016,
+              color: Color(0xff606062),
+              fontWeight: FontWeight.w400,
+            ),
           ),
         ],
       ),
@@ -92,11 +116,12 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
           Text(
             'TOTAL BALANCE',
             style: GoogleFonts.outfit(
-              fontSize: screenHeight * 0.018,
-              color: Colors.grey,
+              fontSize: screenHeight * 0.012,
+              color: Color(0xff606062),
+              fontWeight: FontWeight.w600,
             ),
           ),
-          SizedBox(height: screenHeight * 0.01),
+          SizedBox(height: screenHeight * 0.005),
           TweenAnimationBuilder<double>(
             tween: Tween<double>(begin: 0, end: totalAmount),
             duration: const Duration(seconds: 2),
@@ -105,7 +130,8 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
                 formatIndianCurrency(value),
                 style: GoogleFonts.outfit(
                   fontSize: screenHeight * 0.035,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xff0E0A1F),
                 ),
               );
             },
@@ -162,14 +188,14 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
                     height: screenHeight * 0.03,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.black,
+                      color: Color(0xff606062),
                     ),
                     child: Center(
                       child: Text(
                         payment.number,
                         style: GoogleFonts.outfit(
                           fontSize: screenHeight * 0.015,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w500,
                           color: Colors.white,
                         ),
                       ),
@@ -180,8 +206,8 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
                     payment.date,
                     style: GoogleFonts.outfit(
                       fontSize: screenHeight * 0.016,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.bold,
+                      color: Color(0xff606062),
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
@@ -189,9 +215,9 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
               Text(
                 payment.status,
                 style: GoogleFonts.outfit(
-                  fontSize: screenHeight * 0.016,
+                  fontSize: screenHeight * 0.013,
                   color: payment.statusColor,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
@@ -199,9 +225,10 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
           SizedBox(height: screenHeight * 0.01),
           Text(
             payment.description,
-            style: GoogleFonts.outfit(
-              fontSize: screenHeight * 0.018,
-              fontWeight: FontWeight.bold,
+            style: GoogleFonts.openSans(
+              fontSize: screenHeight * 0.015,
+              fontWeight: FontWeight.w400,
+              color: Color(0xff606062),
             ),
           ),
           SizedBox(height: screenHeight * 0.008),
@@ -212,9 +239,9 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
                 text: TextSpan(
                   text: payment.amount,
                   style: GoogleFonts.outfit(
-                    fontSize: screenHeight * 0.018,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
+                    fontSize: screenHeight * 0.016,
+                    color: Color(0xff0E0A1F),
+                    fontWeight: FontWeight.w600,
                     decoration:
                         payment.status == 'RECEIVED'
                             ? TextDecoration.lineThrough
@@ -224,9 +251,9 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
                     TextSpan(
                       text: ' Inc GST',
                       style: GoogleFonts.outfit(
-                        fontSize: screenHeight * 0.015,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.normal,
+                        fontSize: screenHeight * 0.012,
+                        color: Color(0xff606062),
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
@@ -246,7 +273,7 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
                       style: GoogleFonts.outfit(
                         fontSize: screenHeight * 0.016,
                         color: Colors.green,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -266,8 +293,8 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
                       style: GoogleFonts.outfit(
                         fontSize: screenHeight * 0.016,
                         color: Color(0xFF960000),
-                        fontWeight: FontWeight.w700,
-                      ), 
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 )
@@ -307,8 +334,9 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
           child: Text(
             'QUICK ACTIONS',
             style: GoogleFonts.outfit(
-              fontSize: screenHeight * 0.02,
-              fontWeight: FontWeight.bold,
+              fontSize: screenHeight * 0.014,
+              fontWeight: FontWeight.w500,
+              color: Color(0xff606062),
             ),
           ),
         ),
@@ -335,6 +363,8 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
     QuickActionModel action,
   ) {
     return Container(
+      width: 343,
+      height: 60,
       margin: EdgeInsets.all(screenWidth * 0.01),
       decoration: BoxDecoration(border: Border.all(color: Colors.black)),
       child: ListTile(
@@ -342,12 +372,17 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
           action.title,
           style: GoogleFonts.outfit(
             fontSize: screenHeight * 0.018,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w400,
+            color: Color(0xff0E0A1F)
           ),
         ),
         subtitle: Text(
           action.description,
-          style: GoogleFonts.outfit(fontSize: screenHeight * 0.015, color: Colors.grey),
+          style: GoogleFonts.openSans(
+            fontSize: screenHeight * 0.0125,
+            color: Color(0xff606062),
+            fontWeight: FontWeight.w400
+          ),
         ),
         trailing: Icon(Icons.arrow_forward_ios, size: screenHeight * 0.02),
         onTap: () => _handleQuickAction(action.title),

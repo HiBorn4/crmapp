@@ -4,15 +4,22 @@ import 'package:get/get.dart';
 import '../widgets/overview_donut_chart.dart';
 
 class OverviewScreen extends StatefulWidget {
+  const OverviewScreen({super.key});
+
   @override
   _OverviewScreenState createState() => _OverviewScreenState();
 }
 
 class _OverviewScreenState extends State<OverviewScreen> {
-  final List<String> dropdownOptions = ["Yesterday", "This week", "7 days ago", "This Month"];
+  final List<String> dropdownOptions = [
+    "Yesterday",
+    "This week",
+    "7 days ago",
+    "This Month",
+  ];
 
-  String selectedActivityOption = "Yesterday";  // Dropdown for MY ACTIVITY
-  String selectedOverviewOption = "Yesterday";  // Dropdown for OVERVIEW
+  String selectedActivityOption = "Yesterday"; // Dropdown for MY ACTIVITY
+  String selectedOverviewOption = "Yesterday"; // Dropdown for OVERVIEW
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +34,23 @@ class _OverviewScreenState extends State<OverviewScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Center(
+                child: Container(
+                  width: screenHeight * 0.35,
+                  height: 1,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        Colors.transparent,
+                        Colors.grey.shade400,
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
               SizedBox(height: screenHeight * 0.02),
               _buildMyActivitySection(screenWidth, screenHeight),
               SizedBox(height: screenHeight * 0.02),
@@ -47,11 +71,14 @@ class _OverviewScreenState extends State<OverviewScreen> {
             icon: Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () => Get.back(),
           ),
-          Text('Overview',
-              style: TextStyle(
-                fontSize: screenWidth * 0.05,
-                fontWeight: FontWeight.bold,
-              )),
+          Text(
+            'Overview',
+            style: TextStyle(
+              fontSize: screenWidth * 0.05,
+              fontWeight: FontWeight.w600,
+              color: Color(0xff0E0A1F),
+            ),
+          ),
         ],
       ),
       backgroundColor: Colors.white,
@@ -63,7 +90,11 @@ class _OverviewScreenState extends State<OverviewScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        _buildSectionHeader('MY ACTIVITY', screenWidth, true),  // Pass true for activity dropdown
+        _buildSectionHeader(
+          'MY ACTIVITY',
+          screenWidth,
+          true,
+        ), // Pass true for activity dropdown
         SizedBox(height: screenWidth * 0.02),
 
         // Donut & Text Side by Side
@@ -90,13 +121,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
     return Container(
       width: screenWidth * 0.5,
       height: screenWidth * 0.5,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white,
-      ),
-      child: CustomPaint(
-        painter: DonutChartPainter(),
-      ),
+      decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+      child: CustomPaint(painter: DonutChartPainter()),
     );
   }
 
@@ -127,11 +153,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
   Widget _buildLegendItem(String label, Color color) {
     return Row(
       children: [
-        Container(
-          width: 12,
-          height: 12,
-          color: color,
-        ),
+        Container(width: 12, height: 12, color: color),
         SizedBox(width: 6),
         Text(label, style: TextStyle(fontSize: 14)),
         SizedBox(width: 6),
@@ -144,11 +166,10 @@ class _OverviewScreenState extends State<OverviewScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: TextStyle(fontSize: 16)),
-        Text(value,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            )),
+        Text(
+          value,
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
       ],
     );
   }
@@ -157,7 +178,11 @@ class _OverviewScreenState extends State<OverviewScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader('OVERVIEW', screenWidth, false),  // Pass false for overview dropdown
+        _buildSectionHeader(
+          'OVERVIEW',
+          screenWidth,
+          false,
+        ), // Pass false for overview dropdown
         SizedBox(height: screenWidth * 0.02),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -170,26 +195,34 @@ class _OverviewScreenState extends State<OverviewScreen> {
     );
   }
 
-  Widget _buildOverviewBox(String value, String label, String percentage, bool isIncrease, double screenWidth) {
+  Widget _buildOverviewBox(
+    String value,
+    String label,
+    String percentage,
+    bool isIncrease,
+    double screenWidth,
+  ) {
     return Container(
       width: screenWidth * 0.42,
       padding: EdgeInsets.all(screenWidth * 0.02),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black),
-      ),
+      decoration: BoxDecoration(border: Border.all(color: Colors.black)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(value,
-              style: TextStyle(
-                fontSize: screenWidth * 0.06,
-                fontWeight: FontWeight.bold,
-              )),
-          Text(label,
-              style: TextStyle(
-                fontSize: screenWidth * 0.04,
-                color: Colors.grey[600],
-              )),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: screenWidth * 0.06,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: screenWidth * 0.04,
+              color: Colors.grey[600],
+            ),
+          ),
           SizedBox(height: screenWidth * 0.02),
           Row(
             children: [
@@ -205,12 +238,14 @@ class _OverviewScreenState extends State<OverviewScreen> {
                   color: isIncrease ? Colors.green[400] : Colors.red[400],
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: Text(percentage,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: screenWidth * 0.035,
-                      fontWeight: FontWeight.bold,
-                    )),
+                child: Text(
+                  percentage,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: screenWidth * 0.035,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           ),
@@ -224,14 +259,21 @@ class _OverviewScreenState extends State<OverviewScreen> {
       padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          value: isActivity ? selectedActivityOption : selectedOverviewOption,  // Use respective state variable
+          value:
+              isActivity
+                  ? selectedActivityOption
+                  : selectedOverviewOption, // Use respective state variable
           icon: Icon(Icons.arrow_drop_down, size: screenWidth * 0.04),
-          items: dropdownOptions.map((String option) {
-            return DropdownMenuItem<String>(
-              value: option,
-              child: Text(option, style: TextStyle(fontSize: screenWidth * 0.035)),
-            );
-          }).toList(),
+          items:
+              dropdownOptions.map((String option) {
+                return DropdownMenuItem<String>(
+                  value: option,
+                  child: Text(
+                    option,
+                    style: TextStyle(fontSize: screenWidth * 0.035),
+                  ),
+                );
+              }).toList(),
           onChanged: (newValue) {
             setState(() {
               if (isActivity) {
@@ -246,17 +288,29 @@ class _OverviewScreenState extends State<OverviewScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title, double screenWidth, bool isActivity) {
+  Widget _buildSectionHeader(
+    String title,
+    double screenWidth,
+    bool isActivity,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title,
+        Padding(
+          padding: const EdgeInsets.only(left: 4.0),
+          child: Text(
+            title,
             style: TextStyle(
-              color: Colors.grey[600],
+              color: Color(0xff606062),
               fontSize: screenWidth * 0.035,
-              fontWeight: FontWeight.bold,
-            )),
-        _buildDropDownButton(screenWidth, isActivity),  // Pass flag to differentiate
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        _buildDropDownButton(
+          screenWidth,
+          isActivity,
+        ), // Pass flag to differentiate
       ],
     );
   }
