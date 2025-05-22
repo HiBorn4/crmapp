@@ -77,7 +77,7 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
             SizedBox(height: screenHeight * 0.03),
             _buildApplicantDetailsCard(screenWidth, screenHeight),
             SizedBox(height: screenHeight * 0.03),
-            _buildUnitDimensions(screenWidth, screenHeight),
+            // _buildUnitDimensions(screenWidth, screenHeight),
           ],
         ),
       ),
@@ -810,155 +810,156 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
   }
 
   Widget _buildApplicantDetailsCard(double screenWidth, double screenHeight) {
-  List<String> avatarPaths = [
-    'assets/avatar1.png',
-    'assets/avatar2.png',
-    'assets/avatar1.png',
-    // Add more if needed
-  ];
+    List<String> avatarPaths = [
+      'assets/avatar1.png',
+      'assets/avatar2.png',
+      'assets/avatar1.png',
+      // Add more if needed
+    ];
 
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        'APPLICANT DETAILS',
-        style: TextStyle(
-          fontSize: Responsive.getFontSize(screenWidth, 13),
-          fontWeight: FontWeight.bold,
-          color: const Color(0xFF606062),
-        ),
-      ),
-      SizedBox(height: screenHeight * 0.01),
-      Container(
-        padding: EdgeInsets.symmetric(
-          vertical: screenHeight * 0.015,
-          horizontal: screenWidth * 0.035,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(screenWidth * 0.025),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            buildOverlappingAvatars(
-              screenWidth: screenWidth,
-              avatarPaths: avatarPaths,
-            ),
-            Expanded(
-              child: Text(
-                '${avatarPaths.length} applicants',
-                style: TextStyle(
-                  fontSize: Responsive.getFontSize(screenWidth, 13),
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-            Text(
-              '1 KYC Pending',
-              style: TextStyle(
-                fontSize: Responsive.getFontSize(screenWidth, 14),
-                fontWeight: FontWeight.bold,
-                color: Color(0XFF960000),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ],
-  );
-}
-
-
-Widget buildOverlappingAvatars({
-  required double screenWidth,
-  required List<String> avatarPaths,
-}) {
-  double avatarRadius = screenWidth * 0.04;
-  double overlapOffset = screenWidth * 0.045;
-  int maxVisible = 3;
-
-  List<Widget> avatarWidgets = [];
-
-  for (int i = 0; i < avatarPaths.length && i < maxVisible; i++) {
-    avatarWidgets.add(Positioned(
-      left: i * overlapOffset,
-      child: CircleAvatar(
-        radius: avatarRadius,
-        backgroundImage: AssetImage(avatarPaths[i]),
-      ),
-    ));
-  }
-
-  if (avatarPaths.length > maxVisible) {
-    int remaining = avatarPaths.length - maxVisible;
-    avatarWidgets.add(Positioned(
-      left: maxVisible * overlapOffset,
-      child: CircleAvatar(
-        radius: avatarRadius,
-        backgroundColor: Colors.grey[300],
-        child: Text(
-          '+$remaining',
-          style: TextStyle(
-            fontSize: avatarRadius * 0.9,
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    ));
-  }
-
-  return SizedBox(
-    width: (maxVisible + 1) * overlapOffset + avatarRadius,
-    height: avatarRadius * 2,
-    child: Stack(children: avatarWidgets),
-  );
-}
-
-
-
-  Widget _buildUnitDimensions(double screenWidth, double screenHeight) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'UNIT DIMENSIONS',
+          'APPLICANT DETAILS',
           style: TextStyle(
             fontSize: Responsive.getFontSize(screenWidth, 13),
             fontWeight: FontWeight.bold,
-          color: const Color(0xFF606062),
+            color: const Color(0xFF606062),
           ),
         ),
-        SizedBox(height: screenWidth * 0.03),
-        Center(
-          // child: Container(
-          //   height: screenHeight * 0.35, // Adjusted for better fit
-          //   padding: EdgeInsets.all(screenWidth * 0.04),
-          //   child: DimensionGraph(
-          //     screenWidth: screenWidth,
-          //     screenHeight: screenHeight,
-          //   ),
-          // ),
-          child: PlotOrientationDiagram(
-  D: 20, // your base unit
-  plotNo: '34',
-  adjacentPlotNo: '33',
-  northIcon: Image.asset('assets/avatar1.png'),
-  southIcon: Image.asset('assets/avatar2.png'),
-  eastIcon: Image.asset('assets/avatar1.png'),
-  westIcon: Image.asset('assets/avatar2.png'),
-  roadLabel: '9MM Road',
-),
+        SizedBox(height: screenHeight * 0.01),
+        Container(
+          padding: EdgeInsets.symmetric(
+            vertical: screenHeight * 0.015,
+            horizontal: screenWidth * 0.035,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(screenWidth * 0.025),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              buildOverlappingAvatars(
+                screenWidth: screenWidth,
+                avatarPaths: avatarPaths,
+              ),
+              Expanded(
+                child: Text(
+                  '${avatarPaths.length} applicants',
+                  style: TextStyle(
+                    fontSize: Responsive.getFontSize(screenWidth, 13),
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+              Text(
+                '1 KYC Pending',
+                style: TextStyle(
+                  fontSize: Responsive.getFontSize(screenWidth, 14),
+                  fontWeight: FontWeight.bold,
+                  color: Color(0XFF960000),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
+
+  Widget buildOverlappingAvatars({
+    required double screenWidth,
+    required List<String> avatarPaths,
+  }) {
+    double avatarRadius = screenWidth * 0.04;
+    double overlapOffset = screenWidth * 0.045;
+    int maxVisible = 3;
+
+    List<Widget> avatarWidgets = [];
+
+    for (int i = 0; i < avatarPaths.length && i < maxVisible; i++) {
+      avatarWidgets.add(
+        Positioned(
+          left: i * overlapOffset,
+          child: CircleAvatar(
+            radius: avatarRadius,
+            backgroundImage: AssetImage(avatarPaths[i]),
+          ),
+        ),
+      );
+    }
+
+    if (avatarPaths.length > maxVisible) {
+      int remaining = avatarPaths.length - maxVisible;
+      avatarWidgets.add(
+        Positioned(
+          left: maxVisible * overlapOffset,
+          child: CircleAvatar(
+            radius: avatarRadius,
+            backgroundColor: Colors.grey[300],
+            child: Text(
+              '+$remaining',
+              style: TextStyle(
+                fontSize: avatarRadius * 0.9,
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SizedBox(
+      width: (maxVisible + 1) * overlapOffset + avatarRadius,
+      height: avatarRadius * 2,
+      child: Stack(children: avatarWidgets),
+    );
+  }
+
+  //   Widget _buildUnitDimensions(double screenWidth, double screenHeight) {
+  //     return Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Text(
+  //           'UNIT DIMENSIONS',
+  //           style: TextStyle(
+  //             fontSize: Responsive.getFontSize(screenWidth, 13),
+  //             fontWeight: FontWeight.bold,
+  //           color: const Color(0xFF606062),
+  //           ),
+  //         ),
+  //         SizedBox(height: screenWidth * 0.03),
+  //         Center(
+  //           // child: Container(
+  //           //   height: screenHeight * 0.35, // Adjusted for better fit
+  //           //   padding: EdgeInsets.all(screenWidth * 0.04),
+  //           //   child: DimensionGraph(
+  //           //     screenWidth: screenWidth,
+  //           //     screenHeight: screenHeight,
+  //           //   ),
+  //           // ),
+  //           child: PlotOrientationDiagram(
+  //   D: 20, // your base unit
+  //   plotNo: '34',
+  //   adjacentPlotNo: '33',
+  //   northIcon: Image.asset('assets/avatar1.png'),
+  //   southIcon: Image.asset('assets/avatar2.png'),
+  //   eastIcon: Image.asset('assets/avatar1.png'),
+  //   westIcon: Image.asset('assets/avatar2.png'),
+  //   roadLabel: '9MM Road',
+  // ),
+  //         ),
+  //       ],
+  //     );
+  //   }
 }
