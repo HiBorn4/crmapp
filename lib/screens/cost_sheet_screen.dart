@@ -17,7 +17,7 @@ class CostSheetScreen extends StatefulWidget {
   final String projectUid;
   final String userUid;
 
-  CostSheetScreen(this.projectUid, this.userUid);
+  const CostSheetScreen(this.projectUid, this.userUid, {super.key});
 
   @override
   State<CostSheetScreen> createState() => _CostSheetScreenState();
@@ -177,46 +177,55 @@ class _CostSheetScreenState extends State<CostSheetScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          color: violetColor,
-          padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.04,
-            vertical: screenHeight * 0.012,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title,
-                style: GoogleFonts.outfit(
-                  fontSize: screenHeight * 0.016,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xff0E0A1F),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          child: Container(
+            color: violetColor,
+            padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.04,
+              vertical: screenHeight * 0.012,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.outfit(
+                    fontSize: screenHeight * 0.016,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xff0E0A1F),
+                  ),
                 ),
-              ),
-              Text(
-                'Price',
-                style: GoogleFonts.outfit(
-                  fontSize: screenHeight * 0.016,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xff0E0A1F),
+                Text(
+                  'Price',
+                  style: GoogleFonts.outfit(
+                    fontSize: screenHeight * 0.016,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xff0E0A1F),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-        Container(height: 2, color: Color(0xFFC7BBFC)),
-        Container(
-          color: Colors.white,
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-          child: Column(
-            children: [
-              ...items.map(
-                (item) => _buildCostItem(item, screenWidth, screenHeight),
-              ),
-              _buildDashedDivider(),
-              _buildTotalRow(screenWidth, screenHeight, total),
-            ],
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          child: Container(height: 2, color: Color(0xFFC7BBFC)),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          child: Container(
+            color: Colors.white,
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+            child: Column(
+              children: [
+                ...items.map(
+                  (item) => _buildCostItem(item, screenWidth, screenHeight),
+                ),
+                _buildDashedDivider(),
+                _buildTotalRow(screenWidth, screenHeight, total),
+              ],
+            ),
           ),
         ),
         SizedBox(height: screenHeight * 0.02),

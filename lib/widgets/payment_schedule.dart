@@ -1,5 +1,6 @@
 import 'package:crmapp/utils/amount_formatting.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../models/payment_entry_model.dart';
 import '../utils/app_colors.dart';
@@ -97,8 +98,8 @@ String _formatIndianCurrency(int amount) {
                     widget.payment.date,
                     style: TextStyle(
                       fontSize: widget.screenHeight * 0.016,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.bold,
+                      color: Color(0xff0E0A1F),
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
@@ -108,9 +109,9 @@ String _formatIndianCurrency(int amount) {
               Text(
                 widget.payment.status,
                 style: TextStyle(
-                  fontSize: widget.screenHeight * 0.016,
+                  fontSize: widget.screenHeight * 0.013,
                   color: widget.payment.statusColor,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
@@ -121,9 +122,10 @@ String _formatIndianCurrency(int amount) {
           /// Payment description
           Text(
             widget.payment.description,
-            style: TextStyle(
-              fontSize: widget.screenHeight * 0.018,
-              fontWeight: FontWeight.bold,
+            style: GoogleFonts.openSans(
+              fontSize: widget.screenHeight * 0.016,
+              fontWeight: FontWeight.w400,
+              color: Color(0xff0E0A1F)
             ),
           ),
 

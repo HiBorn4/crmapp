@@ -1,28 +1,29 @@
 import 'package:crmapp/screens/activity_log_screen.dart';
 import 'package:crmapp/screens/cost_sheet_screen.dart';
-import 'package:crmapp/screens/modification_screen.dart';
+// import 'package:crmapp/screens/modification_screen.dart';
 import 'package:crmapp/screens/transaction_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_direct_caller_plugin/flutter_direct_caller_plugin.dart';
+// import 'package:flutter_direct_caller_plugin/flutter_direct_caller_plugin.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../controllers/unit_controller.dart';
-import '../models/cost_item_model.dart';
-import '../models/payment_entry_model.dart';
-import '../utils/app_colors.dart';
-import '../widgets/dimension_graph_chart.dart';
+// import '../models/cost_item_model.dart';
+// import '../models/payment_entry_model.dart';
+// import '../utils/app_colors.dart';
+// import '../widgets/dimension_graph_chart.dart';
 import '../utils/responsive.dart';
 import '../widgets/donut_chart.dart';
 import '../widgets/payment_schedule.dart';
 import 'package:intl/intl.dart';
 
-import '../widgets/unit_dimensions.dart';
+// import '../widgets/unit_dimensions.dart';
 import 'payment_schedule_screen.dart';
 
 class UnitDetailScreen extends StatefulWidget {
   final String projectUid;
   final String userUid;
 
-  UnitDetailScreen(this.projectUid, this.userUid);
+  const UnitDetailScreen(this.projectUid, this.userUid, {super.key});
 
   @override
   State<UnitDetailScreen> createState() => _UnitDetailScreenState();
@@ -57,12 +58,30 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
       backgroundColor: Colors.white,
       appBar: _buildAppBar(screenWidth),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(
-          Responsive.getPadding(screenWidth).horizontal * 0.4,
+        padding: EdgeInsets.symmetric(
+          horizontal: Responsive.getPadding(screenWidth).horizontal * 0.35,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Center(
+              child: Container(
+                width: screenHeight * 0.35,
+                height: 1,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Colors.transparent,
+                      Colors.grey.shade400,
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 18),
             _buildUnitChart(screenWidth, screenHeight),
             SizedBox(height: screenHeight * 0.03),
             _buildMilestoneSection(screenWidth, screenHeight),
@@ -102,14 +121,19 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
         children: [
           Text(
             'Unit Overview',
-            style: TextStyle(
+            style: GoogleFonts.outfit(
               fontSize: Responsive.getFontSize(screenWidth, 20),
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
+              color: Color(0xff0E0A1F),
             ),
           ),
           Text(
             'Shuba Ecostone - 131',
-            style: TextStyle(fontSize: Responsive.getFontSize(screenWidth, 14)),
+            style: GoogleFonts.outfit(
+              fontSize: Responsive.getFontSize(screenWidth, 14),
+              color: Color(0xff606062),
+              fontWeight: FontWeight.w400,
+            ),
           ),
         ],
       ),
@@ -186,26 +210,23 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
           children: [
             Text(
               text,
-              style: TextStyle(
+              style: GoogleFonts.outfit(
                 fontSize:
                     isSelected
                         ? Responsive.getFontSize(
                           screenWidth,
-                          18,
+                          16,
                         ) // Larger for selected
                         : Responsive.getFontSize(
                           screenWidth,
-                          16,
+                          14,
                         ), // Smaller for unselected
                 fontWeight:
                     isSelected
-                        ? FontWeight.w500
-                        : FontWeight.normal, // No bold for unselected
-                color:
-                    isSelected
-                        ? Colors.black
-                        : Colors
-                            .grey[600], // Black for selected, grey for unselected
+                        ? FontWeight.w600
+                        : FontWeight.w400, // No bold for unselected
+                color: isSelected ? Color(0xff0E0A1F) : Color(0xff606062),
+                // Black for selected, grey for unselected
               ),
             ),
             SizedBox(height: 3),
@@ -266,7 +287,7 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
                         total: _controller.totalAmount.value,
                         size: screenWidth * 0.4,
                         paidColor: const Color(0XFFDBD3FD),
-                        eligibleColor: Colors.grey[400]!,
+                        eligibleColor: Color(0xffE7E7E9),
                       ),
                       SizedBox(height: screenWidth * 0.06),
                       Row(
@@ -280,7 +301,7 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
                           ),
                           SizedBox(width: screenWidth * 0.04),
                           _legendBox(
-                            Colors.grey[400]!,
+                            Color(0xffE7E7E9),
                             'Balance',
                             screenWidth,
                             screenHeight,
@@ -303,7 +324,7 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
                   children: [
                     Text(
                       "Balance",
-                      style: TextStyle(fontSize: screenHeight * 0.015),
+                      style: GoogleFonts.openSans(fontSize: screenHeight * 0.015,color: Color(0xff0E0A1F),fontWeight: FontWeight.w400),
                     ),
                     _buildAmountRow(
                       'Balance',
@@ -316,7 +337,7 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
                     SizedBox(height: screenWidth * 0.02),
                     Text(
                       'Eligible Cost',
-                      style: TextStyle(fontSize: screenHeight * 0.015),
+                      style: GoogleFonts.openSans(fontSize: screenHeight * 0.015,color: Color(0xff0E0A1F),fontWeight: FontWeight.w400),
                     ),
                     _buildAmountRow(
                       'Eligible Cost',
@@ -326,7 +347,7 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
                     SizedBox(height: screenWidth * 0.02),
                     Text(
                       'Paid',
-                      style: TextStyle(fontSize: screenHeight * 0.015),
+                      style: GoogleFonts.openSans(fontSize: screenHeight * 0.015,color: Color(0xff0E0A1F),fontWeight: FontWeight.w400),
                     ),
                     _buildAmountRow(
                       'Paid',
@@ -359,8 +380,10 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
         SizedBox(width: screenWidth * 0.015),
         Text(
           label,
-          style: TextStyle(
-            fontSize: screenHeight * 0.016, // Scales based on screen height
+          style: GoogleFonts.openSans(
+            fontSize: screenHeight * 0.015, 
+            color: Color(0xff606062),
+            fontWeight: FontWeight.w400
           ),
         ),
       ],
@@ -372,7 +395,7 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
   //   return Center(
   //     child: Text(
   //       'Unit Cost Details Coming Soon!',
-  //       style: TextStyle(fontSize: Responsive.getFontSize(screenWidth, 16)),
+  //       style: GoogleFonts.outfit(fontSize: Responsive.getFontSize(screenWidth, 16)),
   //     ),
   //   );
   // }
@@ -387,7 +410,11 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
         children: [
           Text(
             value,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+            style: GoogleFonts.outfit(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Color(0xff0E0A1F)
+            ),
           ),
         ],
       ),
@@ -398,12 +425,15 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'UPCOMING EVENTS',
-          style: TextStyle(
-            fontSize: Responsive.getFontSize(screenWidth, 14),
-            fontWeight: FontWeight.bold,
-            color: Color(0XFF606062),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6.0),
+          child: Text(
+            'UPCOMING EVENTS',
+            style: GoogleFonts.outfit(
+              fontSize: Responsive.getFontSize(screenWidth, 14),
+              fontWeight: FontWeight.w500,
+              color: Color(0XFF606062),
+            ),
           ),
         ),
         _milestoneCard(
@@ -412,10 +442,10 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
           value: '₹ 22,76,36,500',
           trailing: Text(
             'Due in 2 days',
-            style: TextStyle(
+            style: GoogleFonts.outfit(
               color: Color(0XFF960000),
               fontSize: screenWidth * 0.027,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w400,
             ),
           ),
         ),
@@ -463,19 +493,21 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
                     SizedBox(width: screenWidth * 0.01),
                     Text(
                       title,
-                      style: TextStyle(
+                      style: GoogleFonts.openSans(
                         fontSize: screenWidth * 0.032,
-                        color: Colors.grey[600],
+                        color: Color(0xff606062),
+                        fontWeight: FontWeight.w400
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: screenWidth * 0.005),
+                SizedBox(height: screenWidth * 0.01),
                 Text(
                   value,
-                  style: TextStyle(
+                  style: GoogleFonts.outfit(
                     fontSize: screenWidth * 0.035,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xff0E0A1F)
                   ),
                 ),
               ],
@@ -496,24 +528,30 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'CATEGORY',
-              style: TextStyle(
-                fontSize: Responsive.getFontSize(screenWidth, 14),
-                fontWeight: FontWeight.bold,
-                color: const Color(0XFF606062),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6.0),
+              child: Text(
+                'CATEGORY',
+                style: GoogleFonts.outfit(
+                  fontSize: Responsive.getFontSize(screenWidth, 14),
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0XFF606062),
+                ),
               ),
             ),
             GestureDetector(
               onTap: () {
                 Get.toNamed('/allCategories');
               },
-              child: Text(
-                'View All',
-                style: TextStyle(
-                  fontSize: Responsive.getFontSize(screenWidth, 14),
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0XFF606062),
+              child: Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: Text(
+                  'View All',
+                  style: GoogleFonts.outfit(
+                    fontSize: Responsive.getFontSize(screenWidth, 14),
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0XFF606062),
+                  ),
                 ),
               ),
             ),
@@ -599,10 +637,10 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
           SizedBox(height: screenHeight * 0.01),
           Text(
             label,
-            style: TextStyle(
+            style: GoogleFonts.openSans(
               fontSize: textSize,
-              fontWeight: FontWeight.w500,
-              color: const Color(0XFF606062),
+              fontWeight: FontWeight.w600,
+              color: const Color(0XFF0E0A1F),
             ),
             textAlign: TextAlign.center,
           ),
@@ -621,14 +659,18 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'PAYMENT SCHEDULE',
-            style: TextStyle(
-              fontSize: Responsive.getFontSize(screenWidth, 14),
-              fontWeight: FontWeight.bold,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6.0),
+            child: Text(
+              'PAYMENT SCHEDULE',
+              style: GoogleFonts.outfit(
+                fontSize: Responsive.getFontSize(screenWidth, 14),
+                fontWeight: FontWeight.w500,
+                color: Color(0xff606062)
+              ),
             ),
           ),
-          SizedBox(height: screenWidth * 0.03),
+          SizedBox(height: screenWidth * 0.015),
 
           // Display up to 3 payment widgets
           ListView.builder(
@@ -654,33 +696,36 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
                       widget.userUid,
                     ),
                   ),
-              child: Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(
-                  vertical: screenHeight * 0.018,
-                  horizontal: screenWidth * 0.04,
-                ),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300, width: 1),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'View All',
-                      style: TextStyle(
-                        fontSize: Responsive.getFontSize(screenWidth, 13),
-                        fontWeight: FontWeight.bold,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(
+                    vertical: screenHeight * 0.015,
+                    horizontal: screenWidth * 0.04,
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300, width: 1),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'View All',
+                        style: GoogleFonts.outfit(
+                          fontSize: Responsive.getFontSize(screenWidth, 15),
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff0E0A1F),
+                        ),
+                      ),
+                      SizedBox(width: screenWidth * 0.015),
+                      Icon(
+                        Icons.arrow_forward,
+                        size: screenWidth * 0.045,
                         color: Colors.black,
                       ),
-                    ),
-                    SizedBox(width: screenWidth * 0.015),
-                    Icon(
-                      Icons.arrow_forward,
-                      size: screenWidth * 0.045,
-                      color: Colors.black,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -703,12 +748,15 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'COST SHEET',
-          style: TextStyle(
-            fontSize: Responsive.getFontSize(screenWidth, 14),
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF606062),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6.0),
+          child: Text(
+            'COST SHEET',
+            style: GoogleFonts.outfit(
+              fontSize: Responsive.getFontSize(screenWidth, 14),
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF606062),
+            ),
           ),
         ),
         SizedBox(height: screenHeight * 0.015),
@@ -741,22 +789,22 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
                         Flexible(
                           child: Text(
                             item['label']!,
-                            style: TextStyle(
+                            style: GoogleFonts.openSans(
                               fontSize: Responsive.getFontSize(
                                 screenWidth,
                                 14.5,
                               ),
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xff0E0A1F),
                             ),
                           ),
                         ),
                         Text(
                           item['amount']!,
-                          style: TextStyle(
+                          style: GoogleFonts.outfit(
                             fontSize: Responsive.getFontSize(screenWidth, 14.5),
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xff0E0A1F),
                           ),
                         ),
                       ],
@@ -775,33 +823,36 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
             // Replace with your desired navigation
             Get.to(() => CostSheetScreen(widget.projectUid, widget.userUid));
           },
-          child: Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(
-              vertical: screenHeight * 0.015,
-              horizontal: screenWidth * 0.04,
-            ),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'View all',
-                  style: TextStyle(
-                    fontSize: Responsive.getFontSize(screenWidth, 13),
-                    fontWeight: FontWeight.bold,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6.0),
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(
+                vertical: screenHeight * 0.015,
+                horizontal: screenWidth * 0.04,
+              ),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'View all',
+                    style: GoogleFonts.outfit(
+                      fontSize: Responsive.getFontSize(screenWidth, 13),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  SizedBox(width: screenWidth * 0.015),
+                  Icon(
+                    Icons.arrow_forward,
+                    size: screenWidth * 0.045,
                     color: Colors.black,
                   ),
-                ),
-                SizedBox(width: screenWidth * 0.015),
-                Icon(
-                  Icons.arrow_forward,
-                  size: screenWidth * 0.045,
-                  color: Colors.black,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -820,56 +871,62 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'APPLICANT DETAILS',
-          style: TextStyle(
-            fontSize: Responsive.getFontSize(screenWidth, 13),
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF606062),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6.0),
+          child: Text(
+            'APPLICANT DETAILS',
+            style: GoogleFonts.outfit(
+              fontSize: Responsive.getFontSize(screenWidth, 13),
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF606062),
+            ),
           ),
         ),
         SizedBox(height: screenHeight * 0.01),
-        Container(
-          padding: EdgeInsets.symmetric(
-            vertical: screenHeight * 0.015,
-            horizontal: screenWidth * 0.035,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(screenWidth * 0.025),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              buildOverlappingAvatars(
-                screenWidth: screenWidth,
-                avatarPaths: avatarPaths,
-              ),
-              Expanded(
-                child: Text(
-                  '${avatarPaths.length} applicants',
-                  style: TextStyle(
-                    fontSize: Responsive.getFontSize(screenWidth, 13),
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6.0),
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              vertical: screenHeight * 0.015,
+              horizontal: screenWidth * 0.035,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(screenWidth * 0.025),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                buildOverlappingAvatars(
+                  screenWidth: screenWidth,
+                  avatarPaths: avatarPaths,
+                ),
+                Expanded(
+                  child: Text(
+                    '${avatarPaths.length} applicants',
+                    style: GoogleFonts.outfit(
+                      fontSize: Responsive.getFontSize(screenWidth, 13),
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xff0E0A1F),
+                    ),
                   ),
                 ),
-              ),
-              Text(
-                '1 KYC Pending',
-                style: TextStyle(
-                  fontSize: Responsive.getFontSize(screenWidth, 14),
-                  fontWeight: FontWeight.bold,
-                  color: Color(0XFF960000),
+                Text(
+                  '1 KYC Pending',
+                  style: GoogleFonts.outfit(
+                    fontSize: Responsive.getFontSize(screenWidth, 14),
+                    fontWeight: FontWeight.w500,
+                    color: Color(0XFF960000),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],
@@ -908,7 +965,7 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
             backgroundColor: Colors.grey[300],
             child: Text(
               '+$remaining',
-              style: TextStyle(
+              style: GoogleFonts.outfit(
                 fontSize: avatarRadius * 0.9,
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
@@ -932,7 +989,7 @@ class _UnitDetailScreenState extends State<UnitDetailScreen>
   //       children: [
   //         Text(
   //           'UNIT DIMENSIONS',
-  //           style: TextStyle(
+  //           style: GoogleFonts.outfit(
   //             fontSize: Responsive.getFontSize(screenWidth, 13),
   //             fontWeight: FontWeight.bold,
   //           color: const Color(0xFF606062),

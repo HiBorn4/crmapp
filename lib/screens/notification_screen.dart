@@ -1,8 +1,8 @@
-import 'package:crmapp/widgets/footer.dart';
+// import 'package:crmapp/widgets/footer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/profile_controller.dart';
-import '../utils/responsive.dart';
+// import '../utils/responsive.dart';
 
 class NotificationScreen extends StatefulWidget {
   @override

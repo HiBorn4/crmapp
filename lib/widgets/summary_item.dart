@@ -17,8 +17,8 @@ class SummaryItem extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Container(
-      width: 107,
-      height: 128,
+      width: screenWidth * 0.25,
+      height: screenWidth * 0.36,
       margin: EdgeInsets.only(left: isFirst ? 0 : screenWidth * 0.012),
       padding: EdgeInsets.all(screenWidth * 0.03),
       decoration: BoxDecoration(
