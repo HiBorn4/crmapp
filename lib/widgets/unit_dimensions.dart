@@ -19,7 +19,7 @@ class PlotOrientationDiagram extends StatelessWidget {
   final String roadLabel;
 
   const PlotOrientationDiagram({
-    Key? key,
+    super.key,
     required this.D,
     required this.plotNo,
     required this.adjacentPlotNo,
@@ -28,7 +28,7 @@ class PlotOrientationDiagram extends StatelessWidget {
     required this.eastIcon,
     required this.westIcon,
     required this.roadLabel,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

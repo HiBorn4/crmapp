@@ -32,9 +32,27 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
       backgroundColor: Colors.white,
       appBar: _buildAppBar(screenWidth, screenHeight),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(screenWidth * 0.04),
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
         child: Column(
           children: [
+            Center(
+              child: Container(
+                width: screenHeight * 0.35,
+                height: 1,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Colors.transparent,
+                      Colors.grey.shade400,
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 18),
             _buildActivityList(screenWidth, screenHeight),
             SizedBox(height: screenHeight * 0.03),
             _buildQuickActionsSection(screenWidth, screenHeight),
@@ -58,7 +76,7 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
             'Activity Log',
             style: GoogleFonts.outfit(
               fontSize: screenHeight * 0.022,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w500,
             ),
           ),
           Obx(
@@ -69,26 +87,10 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
           ),
         ],
       ),
-      bottom: PreferredSize(
-        preferredSize: Size.fromHeight(1),
-        child: Center(
-          child: Container(
-            width: screenHeight * 0.35,
-            height: 1,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [
-                  Colors.transparent,
-                  Colors.grey.shade400,
-                  Colors.transparent,
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+      // bottom: PreferredSize(
+      //   preferredSize: Size.fromHeight(1),
+
+      // ),
       // bottom: PreferredSize(
       //     preferredSize: Size.fromHeight(1), // Adjust height as needed
       //     child: CustomPaint(
@@ -299,7 +301,7 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
           style: GoogleFonts.outfit(
             fontSize: screenHeight * 0.015,
             color: Color(0xff606062),
-            fontWeight: FontWeight.w400
+            fontWeight: FontWeight.w400,
           ),
         ),
         trailing: Icon(Icons.arrow_forward_ios, size: screenHeight * 0.02),

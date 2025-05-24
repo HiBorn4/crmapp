@@ -12,7 +12,7 @@ class PaymentScheduleScreen extends StatefulWidget {
   final String projectUid;
   final String userUid;
 
-  PaymentScheduleScreen(this.projectUid, this.userUid);
+  const PaymentScheduleScreen(this.projectUid, this.userUid, {super.key});
   @override
   State<PaymentScheduleScreen> createState() => _PaymentScheduleScreenState();
 }
@@ -304,7 +304,7 @@ class _PaymentScheduleScreenState extends State<PaymentScheduleScreen> {
                   height: screenHeight * 0.04,
                   decoration: BoxDecoration(
                     color: Color(0xFFD7C5F4),
-                    borderRadius: BorderRadius.circular(screenHeight * 0.005),
+                    borderRadius: BorderRadius.zero,
                   ),
                   child: TextButton(
                     onPressed: () {},
